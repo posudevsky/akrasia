@@ -23,8 +23,6 @@ import type {
   AnalyzeResult,
   ErrorResponse,
   HealthStatus,
-  ParseFileInput,
-  ParseFileResult,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -284,93 +282,4 @@ export const useAdaptResume = <
   TContext
 > => {
   return useMutation(getAdaptResumeMutationOptions(options));
-};
-
-/**
- * Extracts text from uploaded PDF or DOCX file
- * @summary Parse resume file to text
- */
-export const getParseFileUrl = () => {
-  return `/api/parse-file`;
-};
-
-export const parseFile = async (
-  parseFileInput: ParseFileInput,
-  options?: RequestInit,
-): Promise<ParseFileResult> => {
-  const formData = new FormData();
-  formData.append(`file`, parseFileInput.file);
-
-  return customFetch<ParseFileResult>(getParseFileUrl(), {
-    ...options,
-    method: "POST",
-    body: formData,
-  });
-};
-
-export const getParseFileMutationOptions = <
-  TError = ErrorType<ErrorResponse>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof parseFile>>,
-    TError,
-    { data: BodyType<ParseFileInput> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof parseFile>>,
-  TError,
-  { data: BodyType<ParseFileInput> },
-  TContext
-> => {
-  const mutationKey = ["parseFile"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof parseFile>>,
-    { data: BodyType<ParseFileInput> }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return parseFile(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ParseFileMutationResult = NonNullable<
-  Awaited<ReturnType<typeof parseFile>>
->;
-export type ParseFileMutationBody = BodyType<ParseFileInput>;
-export type ParseFileMutationError = ErrorType<ErrorResponse>;
-
-/**
- * @summary Parse resume file to text
- */
-export const useParseFile = <
-  TError = ErrorType<ErrorResponse>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof parseFile>>,
-    TError,
-    { data: BodyType<ParseFileInput> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof parseFile>>,
-  TError,
-  { data: BodyType<ParseFileInput> },
-  TContext
-> => {
-  return useMutation(getParseFileMutationOptions(options));
 };

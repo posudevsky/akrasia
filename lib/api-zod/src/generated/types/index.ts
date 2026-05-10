@@ -12,8 +12,6 @@ export * from "./analyzeInput";
 export * from "./analyzeResult";
 export * from "./errorResponse";
 export * from "./healthStatus";
-export * from "./parseFileInput";
-export * from "./parseFileResult";
 export * from "./requirement";
 export * from "./requirementCriticality";
 export * from "./requirementStatus";

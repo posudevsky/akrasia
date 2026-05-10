@@ -88,37 +88,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-  /parse-file:
-    post:
-      operationId: parseFile
-      tags: [resume]
-      summary: Parse resume file to text
-      description: Extracts text from uploaded PDF or DOCX file
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/ParseFileInput"
-      responses:
-        "200":
-          description: Extracted text
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ParseFileResult"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        "500":
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -197,21 +166,6 @@ components:
           type: string
       required:
         - resumeUpdated
-    ParseFileInput:
-      type: object
-      properties:
-        file:
-          type: string
-          format: binary
-      required:
-        - file
-    ParseFileResult:
-      type: object
-      properties:
-        text:
-          type: string
-      required:
-        - text
     ErrorResponse:
       type: object
       properties:

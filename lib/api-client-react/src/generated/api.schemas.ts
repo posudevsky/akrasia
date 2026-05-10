@@ -57,14 +57,6 @@ export interface AdaptResult {
   resumeUpdated: string;
 }
 
-export interface ParseFileInput {
-  file: Blob;
-}
-
-export interface ParseFileResult {
-  text: string;
-}
-
 export interface ErrorResponse {
   error: string;
 }

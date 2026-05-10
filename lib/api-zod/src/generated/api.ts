@@ -53,15 +53,3 @@ export const AdaptResumeBody = zod.object({
 export const AdaptResumeResponse = zod.object({
   resumeUpdated: zod.string(),
 });
-
-/**
- * Extracts text from uploaded PDF or DOCX file
- * @summary Parse resume file to text
- */
-export const ParseFileBody = zod.object({
-  file: zod.instanceof(File),
-});
-
-export const ParseFileResponse = zod.object({
-  text: zod.string(),
-});
