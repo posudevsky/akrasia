@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: resume
+    description: Resume adaptation operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,99 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /analyze:
+    post:
+      operationId: analyzeResume
+      tags: [resume]
+      summary: Analyze resume against job vacancy
+      description: Extracts requirements from job vacancy and matches them against the resume
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyzeInput"
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyzeResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /adapt:
+    post:
+      operationId: adaptResume
+      tags: [resume]
+      summary: Adapt resume to job vacancy
+      description: Adapts the resume text to match the job vacancy using user answers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdaptInput"
+      responses:
+        "200":
+          description: Adapted resume
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdaptResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /parse-file:
+    post:
+      operationId: parseFile
+      tags: [resume]
+      summary: Parse resume file to text
+      description: Extracts text from uploaded PDF or DOCX file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ParseFileInput"
+      responses:
+        "200":
+          description: Extracted text
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParseFileResult"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +128,94 @@ components:
           type: string
       required:
         - status
-
+    Requirement:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        criticality:
+          type: string
+          enum: [must, nice]
+        status:
+          type: string
+          enum: [confirmed, partial, missing]
+      required:
+        - id
+        - text
+        - criticality
+        - status
+    UserAnswer:
+      type: object
+      properties:
+        requirementId:
+          type: integer
+        answer:
+          type: string
+      required:
+        - requirementId
+        - answer
+    AnalyzeInput:
+      type: object
+      properties:
+        vacancyText:
+          type: string
+        resumeText:
+          type: string
+      required:
+        - vacancyText
+        - resumeText
+    AnalyzeResult:
+      type: object
+      properties:
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/Requirement"
+      required:
+        - requirements
+    AdaptInput:
+      type: object
+      properties:
+        vacancyText:
+          type: string
+        resumeText:
+          type: string
+        userAnswers:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserAnswer"
+      required:
+        - vacancyText
+        - resumeText
+        - userAnswers
+    AdaptResult:
+      type: object
+      properties:
+        resumeUpdated:
+          type: string
+      required:
+        - resumeUpdated
+    ParseFileInput:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
+    ParseFileResult:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+        - text
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

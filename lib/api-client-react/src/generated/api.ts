@@ -5,18 +5,30 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  AdaptInput,
+  AdaptResult,
+  AnalyzeInput,
+  AnalyzeResult,
+  ErrorResponse,
+  HealthStatus,
+  ParseFileInput,
+  ParseFileResult,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -99,3 +111,266 @@ export function useHealthCheck<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Extracts requirements from job vacancy and matches them against the resume
+ * @summary Analyze resume against job vacancy
+ */
+export const getAnalyzeResumeUrl = () => {
+  return `/api/analyze`;
+};
+
+export const analyzeResume = async (
+  analyzeInput: AnalyzeInput,
+  options?: RequestInit,
+): Promise<AnalyzeResult> => {
+  return customFetch<AnalyzeResult>(getAnalyzeResumeUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(analyzeInput),
+  });
+};
+
+export const getAnalyzeResumeMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof analyzeResume>>,
+    TError,
+    { data: BodyType<AnalyzeInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof analyzeResume>>,
+  TError,
+  { data: BodyType<AnalyzeInput> },
+  TContext
+> => {
+  const mutationKey = ["analyzeResume"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof analyzeResume>>,
+    { data: BodyType<AnalyzeInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return analyzeResume(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AnalyzeResumeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof analyzeResume>>
+>;
+export type AnalyzeResumeMutationBody = BodyType<AnalyzeInput>;
+export type AnalyzeResumeMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Analyze resume against job vacancy
+ */
+export const useAnalyzeResume = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof analyzeResume>>,
+    TError,
+    { data: BodyType<AnalyzeInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof analyzeResume>>,
+  TError,
+  { data: BodyType<AnalyzeInput> },
+  TContext
+> => {
+  return useMutation(getAnalyzeResumeMutationOptions(options));
+};
+
+/**
+ * Adapts the resume text to match the job vacancy using user answers
+ * @summary Adapt resume to job vacancy
+ */
+export const getAdaptResumeUrl = () => {
+  return `/api/adapt`;
+};
+
+export const adaptResume = async (
+  adaptInput: AdaptInput,
+  options?: RequestInit,
+): Promise<AdaptResult> => {
+  return customFetch<AdaptResult>(getAdaptResumeUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(adaptInput),
+  });
+};
+
+export const getAdaptResumeMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adaptResume>>,
+    TError,
+    { data: BodyType<AdaptInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adaptResume>>,
+  TError,
+  { data: BodyType<AdaptInput> },
+  TContext
+> => {
+  const mutationKey = ["adaptResume"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adaptResume>>,
+    { data: BodyType<AdaptInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adaptResume(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdaptResumeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adaptResume>>
+>;
+export type AdaptResumeMutationBody = BodyType<AdaptInput>;
+export type AdaptResumeMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Adapt resume to job vacancy
+ */
+export const useAdaptResume = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adaptResume>>,
+    TError,
+    { data: BodyType<AdaptInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adaptResume>>,
+  TError,
+  { data: BodyType<AdaptInput> },
+  TContext
+> => {
+  return useMutation(getAdaptResumeMutationOptions(options));
+};
+
+/**
+ * Extracts text from uploaded PDF or DOCX file
+ * @summary Parse resume file to text
+ */
+export const getParseFileUrl = () => {
+  return `/api/parse-file`;
+};
+
+export const parseFile = async (
+  parseFileInput: ParseFileInput,
+  options?: RequestInit,
+): Promise<ParseFileResult> => {
+  const formData = new FormData();
+  formData.append(`file`, parseFileInput.file);
+
+  return customFetch<ParseFileResult>(getParseFileUrl(), {
+    ...options,
+    method: "POST",
+    body: formData,
+  });
+};
+
+export const getParseFileMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof parseFile>>,
+    TError,
+    { data: BodyType<ParseFileInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof parseFile>>,
+  TError,
+  { data: BodyType<ParseFileInput> },
+  TContext
+> => {
+  const mutationKey = ["parseFile"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof parseFile>>,
+    { data: BodyType<ParseFileInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return parseFile(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ParseFileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof parseFile>>
+>;
+export type ParseFileMutationBody = BodyType<ParseFileInput>;
+export type ParseFileMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Parse resume file to text
+ */
+export const useParseFile = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof parseFile>>,
+    TError,
+    { data: BodyType<ParseFileInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof parseFile>>,
+  TError,
+  { data: BodyType<ParseFileInput> },
+  TContext
+> => {
+  return useMutation(getParseFileMutationOptions(options));
+};

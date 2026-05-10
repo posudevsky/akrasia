@@ -8,3 +8,63 @@
 export interface HealthStatus {
   status: string;
 }
+
+export type RequirementCriticality =
+  (typeof RequirementCriticality)[keyof typeof RequirementCriticality];
+
+export const RequirementCriticality = {
+  must: "must",
+  nice: "nice",
+} as const;
+
+export type RequirementStatus =
+  (typeof RequirementStatus)[keyof typeof RequirementStatus];
+
+export const RequirementStatus = {
+  confirmed: "confirmed",
+  partial: "partial",
+  missing: "missing",
+} as const;
+
+export interface Requirement {
+  id: number;
+  text: string;
+  criticality: RequirementCriticality;
+  status: RequirementStatus;
+}
+
+export interface UserAnswer {
+  requirementId: number;
+  answer: string;
+}
+
+export interface AnalyzeInput {
+  vacancyText: string;
+  resumeText: string;
+}
+
+export interface AnalyzeResult {
+  requirements: Requirement[];
+}
+
+export interface AdaptInput {
+  vacancyText: string;
+  resumeText: string;
+  userAnswers: UserAnswer[];
+}
+
+export interface AdaptResult {
+  resumeUpdated: string;
+}
+
+export interface ParseFileInput {
+  file: Blob;
+}
+
+export interface ParseFileResult {
+  text: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}

@@ -14,3 +14,54 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Extracts requirements from job vacancy and matches them against the resume
+ * @summary Analyze resume against job vacancy
+ */
+export const AnalyzeResumeBody = zod.object({
+  vacancyText: zod.string(),
+  resumeText: zod.string(),
+});
+
+export const AnalyzeResumeResponse = zod.object({
+  requirements: zod.array(
+    zod.object({
+      id: zod.number(),
+      text: zod.string(),
+      criticality: zod.enum(["must", "nice"]),
+      status: zod.enum(["confirmed", "partial", "missing"]),
+    }),
+  ),
+});
+
+/**
+ * Adapts the resume text to match the job vacancy using user answers
+ * @summary Adapt resume to job vacancy
+ */
+export const AdaptResumeBody = zod.object({
+  vacancyText: zod.string(),
+  resumeText: zod.string(),
+  userAnswers: zod.array(
+    zod.object({
+      requirementId: zod.number(),
+      answer: zod.string(),
+    }),
+  ),
+});
+
+export const AdaptResumeResponse = zod.object({
+  resumeUpdated: zod.string(),
+});
+
+/**
+ * Extracts text from uploaded PDF or DOCX file
+ * @summary Parse resume file to text
+ */
+export const ParseFileBody = zod.object({
+  file: zod.instanceof(File),
+});
+
+export const ParseFileResponse = zod.object({
+  text: zod.string(),
+});

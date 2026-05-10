@@ -6,4 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./adaptInput";
+export * from "./adaptResult";
+export * from "./analyzeInput";
+export * from "./analyzeResult";
+export * from "./errorResponse";
 export * from "./healthStatus";
+export * from "./parseFileInput";
+export * from "./parseFileResult";
+export * from "./requirement";
+export * from "./requirementCriticality";
+export * from "./requirementStatus";
+export * from "./userAnswer";
