@@ -63,7 +63,7 @@ export default function ScreenAdapted({ state, onReset }: ScreenAdaptedProps) {
   }, [state.analysisResult, state.userAnswers]);
 
   const rawResume = state.adaptedResume || "";
-  const plainTextResume = rawResume.replace(/<\/?change>/g, "");
+  const plainTextResume = rawResume.replace(/<\/?change>/g, "").replace(/<\/?addition>/g, "");
 
   const handleDownloadTxt = () => {
     const blob = new Blob([plainTextResume], { type: "text/plain;charset=utf-8" });
@@ -110,71 +110,68 @@ export default function ScreenAdapted({ state, onReset }: ScreenAdaptedProps) {
     window.print();
   };
 
-  // Parse text to render <change> spans
+  // Parse text to render <change> and <addition> spans with distinct colours
   const renderResumeText = () => {
     if (!state.adaptedResume) return null;
-    const parts = state.adaptedResume.split(/(<change>|<\/change>)/);
-    
-    let isChanged = false;
-    const elements = [];
-    
+
+    const parts = state.adaptedResume.split(/(<change>|<\/change>|<addition>|<\/addition>)/);
+
+    type TagType = "change" | "addition" | null;
+    let activeTag: TagType = null;
+    const elements: React.ReactNode[] = [];
+
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
-      if (part === "<change>") {
-        isChanged = true;
-      } else if (part === "</change>") {
-        isChanged = false;
-      } else if (part) {
-        if (isChanged) {
-          elements.push(
-            <span key={i} className="bg-amber-100 dark:bg-amber-900/40 border-b-2 border-amber-500 px-1 py-0.5 rounded-sm">
-              {part}
-            </span>
-          );
-        } else {
-          elements.push(<span key={i}>{part}</span>);
-        }
+      if (part === "<change>") { activeTag = "change"; continue; }
+      if (part === "</change>") { activeTag = null; continue; }
+      if (part === "<addition>") { activeTag = "addition"; continue; }
+      if (part === "</addition>") { activeTag = null; continue; }
+      if (!part) continue;
+
+      if (activeTag === "change") {
+        elements.push(
+          <span key={i} style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-0.5 rounded-sm">
+            {part}
+          </span>
+        );
+      } else if (activeTag === "addition") {
+        elements.push(
+          <span key={i} style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-0.5 rounded-sm">
+            {part}
+          </span>
+        );
+      } else {
+        elements.push(<span key={i}>{part}</span>);
       }
     }
-    
+
     // Split by newlines to render paragraphs properly
-    const textElements = [];
+    const textElements: React.ReactNode[] = [];
     let currentLine: React.ReactNode[] = [];
-    
+
     elements.forEach((el, index) => {
-      if (typeof el === 'object' && el.props && typeof el.props.children === 'string') {
-        const lines = el.props.children.split('\n');
-        lines.forEach((line: string, lineIdx: number) => {
-          if (lineIdx > 0) {
-            textElements.push(<p key={`p-${index}-${lineIdx}`} className="min-h-[1em] mb-2">{currentLine}</p>);
-            currentLine = [];
-          }
-          currentLine.push(<span key={`span-${index}-${lineIdx}`} className={el.props.className}>{line}</span>);
-        });
-      } else if (typeof el === 'object' && el.type === 'span' && typeof el.props.children === 'string') {
-         // Plain text span
-         const lines = el.props.children.split('\n');
-         lines.forEach((line: string, lineIdx: number) => {
-           if (lineIdx > 0) {
-             textElements.push(<p key={`p-${index}-${lineIdx}`} className="min-h-[1em] mb-2">{currentLine}</p>);
-             currentLine = [];
-           }
-           currentLine.push(<span key={`span-${index}-${lineIdx}`}>{line}</span>);
-         });
-      } else if (typeof el === 'string') {
-        const lines = el.split('\n');
-        lines.forEach((line, lineIdx) => {
-          if (lineIdx > 0) {
-            textElements.push(<p key={`p-str-${index}-${lineIdx}`} className="min-h-[1em] mb-2">{currentLine}</p>);
-            currentLine = [];
-          }
-          currentLine.push(line);
-        });
+      if (typeof el === "object" && el !== null && "props" in (el as object)) {
+        const node = el as React.ReactElement<{ children: string; className?: string; style?: React.CSSProperties }>;
+        const text = node.props.children;
+        if (typeof text === "string") {
+          const lines = text.split("\n");
+          lines.forEach((line, lineIdx) => {
+            if (lineIdx > 0) {
+              textElements.push(<p key={`p-${index}-${lineIdx}`} className="min-h-[1em] mb-2">{currentLine}</p>);
+              currentLine = [];
+            }
+            currentLine.push(
+              <span key={`s-${index}-${lineIdx}`} className={node.props.className} style={node.props.style}>{line}</span>
+            );
+          });
+        } else {
+          currentLine.push(el);
+        }
       } else {
         currentLine.push(el);
       }
     });
-    
+
     if (currentLine.length > 0) {
       textElements.push(<p key="last-line" className="min-h-[1em] mb-2">{currentLine}</p>);
     }
@@ -199,6 +196,17 @@ export default function ScreenAdapted({ state, onReset }: ScreenAdaptedProps) {
           <Button variant="outline" size="sm" onClick={handleDownloadPdf}>
             <Download className="w-4 h-4 mr-2" /> PDF
           </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-4 text-sm print:hidden">
+        <div className="flex items-center gap-2">
+          <span style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-2 py-0.5 rounded-sm text-slate-700">Аа</span>
+          <span className="text-slate-600">переформулировано из резюме</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-2 py-0.5 rounded-sm text-slate-700">Аа</span>
+          <span className="text-slate-600">новый контент</span>
         </div>
       </div>
 
