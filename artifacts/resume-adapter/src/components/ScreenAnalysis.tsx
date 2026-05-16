@@ -48,11 +48,6 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess }: S
         score = 1;
       } else if (req.status === "partial") {
         score = 0.5;
-      } else if (req.status === "missing") {
-        const answer = state.userAnswers.find(a => a.requirementId === req.id)?.answer;
-        if (answer && answer.trim().length > 0) {
-          score = 0.5; // Treating missing with user answer as partial
-        }
       }
 
       earnedWeight += weight * score;
@@ -60,7 +55,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess }: S
 
     if (totalWeight === 0) return 0;
     return Math.round((earnedWeight / totalWeight) * 100);
-  }, [requirements, state.userAnswers]);
+  }, [requirements]);
 
   const handleAdapt = () => {
     const missingReqs = requirements.filter(r => r.status === "missing");
