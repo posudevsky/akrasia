@@ -95,10 +95,11 @@ router.post("/parse-file", upload.single("file"), async (req, res): Promise<void
     }
 
     if (mimetype === "application/pdf" || ext === "pdf") {
-      // Dynamic import, pdf-parse is a CommonJS module
-      const pdfModule = await import("pdf-parse");
+      // pdf-parse v1 is CommonJS — use createRequire to avoid bundler issues
+      const { createRequire } = await import("module");
+      const require = createRequire(import.meta.url);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pdfParse: (buf: Buffer) => Promise<{ text: string }> = (pdfModule as any).default ?? pdfModule;
+      const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
       const result = await pdfParse(buffer);
       res.json({ text: result.text.trim() });
       return;
