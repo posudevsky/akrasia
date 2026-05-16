@@ -47,11 +47,11 @@ export default function ScreenAdapted({ state, onReset }: ScreenAdaptedProps) {
       if (req.status === "confirmed") {
         score = 1;
       } else if (req.status === "partial") {
-        score = 1; // Assume partials are fixed
+        score = 1; // Assume partials are fixed by adaptation
       } else if (req.status === "missing") {
         const answer = state.userAnswers.find(a => a.requirementId === req.id)?.answer;
         if (answer && answer.trim().length > 0) {
-          score = 1; // Assume answered missings are fixed
+          score = 0.5; // Answered missing → treated as partial
         }
       }
 
