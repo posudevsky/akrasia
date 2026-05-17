@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Акразия"
+title = "акразия"
 version = "1.0.0"
 id = "artifacts/resume-adapter"
 router = "path"
