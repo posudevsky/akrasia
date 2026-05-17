@@ -89,8 +89,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
   return (
     <div className="grid gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Адаптация резюме</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-slate-500 dark:text-slate-400">
           Вставьте текст вакансии и ваше текущее резюме, чтобы получить рекомендации по адаптации.
         </p>
       </div>
