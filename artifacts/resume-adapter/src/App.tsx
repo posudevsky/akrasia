@@ -49,7 +49,7 @@ function AppContent() {
       <header className="border-b bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 p-4">
         <div className="container mx-auto max-w-4xl flex items-center justify-between">
           <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-            акразия<span className="font-normal text-sm text-slate-400 dark:text-slate-500">. адаптация резюме к вакансии</span>
+            акразия<span className="font-normal text-xs text-slate-400 dark:text-slate-500">. адаптация резюме к вакансии</span>
           </h1>
         </div>
       </header>
