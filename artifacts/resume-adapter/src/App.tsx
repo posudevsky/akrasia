@@ -107,6 +107,7 @@ function AppContent() {
               <ScreenAdapted
                 state={state}
                 onReset={resetState}
+                onBackToAnalysis={() => updateState({ step: "analysis" })}
               />
             </motion.div>
           )}

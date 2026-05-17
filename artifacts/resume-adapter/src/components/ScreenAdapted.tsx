@@ -9,9 +9,10 @@ import { saveAs } from "file-saver"; // Usually we'd use this, but we can just u
 interface ScreenAdaptedProps {
   state: AppState;
   onReset: () => void;
+  onBackToAnalysis: () => void;
 }
 
-export default function ScreenAdapted({ state, onReset }: ScreenAdaptedProps) {
+export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: ScreenAdaptedProps) {
   const originalScore = useMemo(() => {
     const requirements = state.analysisResult?.requirements || [];
     let totalWeight = 0;
@@ -216,9 +217,12 @@ export default function ScreenAdapted({ state, onReset }: ScreenAdaptedProps) {
         </CardContent>
       </Card>
 
-      <div className="flex justify-start print:hidden pt-4">
+      <div className="flex justify-between print:hidden pt-4">
+        <Button variant="ghost" onClick={onBackToAnalysis} className="text-slate-500">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
+        </Button>
         <Button variant="ghost" onClick={onReset} className="text-slate-500">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Начать заново
+          Начать заново
         </Button>
       </div>
     </div>
