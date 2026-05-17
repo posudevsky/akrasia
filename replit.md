@@ -1,4 +1,4 @@
-# ResumeFit
+# акразия
 
 A web app that helps Russian-speaking job seekers adapt their resume to a specific job vacancy using Yandex LLM AI.
 
