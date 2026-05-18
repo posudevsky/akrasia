@@ -101,9 +101,6 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
               <Briefcase className="h-5 w-5 text-blue-600" />
               Текст вакансии
             </CardTitle>
-            <CardDescription>
-              Скопируйте и вставьте описание вакансии
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <Textarea
@@ -121,9 +118,6 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
               <FileText className="h-5 w-5 text-blue-600" />
               Ваше резюме
             </CardTitle>
-            <CardDescription>
-              Вставьте текст или загрузите файл
-            </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="text" className="w-full">
