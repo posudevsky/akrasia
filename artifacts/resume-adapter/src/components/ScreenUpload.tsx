@@ -108,7 +108,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
           <CardContent>
             <Textarea
               className="min-h-[300px] resize-none"
-              placeholder="Требуется разработчик..."
+              placeholder="Вставьте описание вакансии с hh.ru или другого сайта"
               value={vacancyText}
               onChange={(e) => setVacancyText(e.target.value)}
             />
@@ -134,7 +134,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
               <TabsContent value="text">
                 <Textarea
                   className="min-h-[252px] resize-none"
-                  placeholder="Опыт работы..."
+                  placeholder="Вставьте текст вашего резюме"
                   value={resumeText}
                   onChange={(e) => setResumeText(e.target.value)}
                 />
@@ -174,7 +174,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
         </Card>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-center">
         <Button 
           size="lg" 
           onClick={handleAnalyze} 
