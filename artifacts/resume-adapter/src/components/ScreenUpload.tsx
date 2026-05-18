@@ -90,7 +90,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
     <div className="grid gap-6">
       <div>
         <p className="text-slate-500 dark:text-slate-400">
-          Вставьте описание вакансии и ваше резюме, чтобы адаптировать резюме к вакансии.
+          Вставьте вакансию и резюме — система проанализирует соответствие и адаптирует резюме.
         </p>
       </div>
 
