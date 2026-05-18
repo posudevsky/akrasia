@@ -90,7 +90,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
     <div className="grid gap-6">
       <div>
         <p className="text-slate-500 dark:text-slate-400">
-          Вставьте текст вакансии и ваше текущее резюме, чтобы получить рекомендации по адаптации.
+          Вставьте описание вакансии и ваше резюме, чтобы адаптировать резюме к вакансии.
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-blue-600" />
-              Текст вакансии
+              Описание вакансии
             </CardTitle>
           </CardHeader>
           <CardContent>
