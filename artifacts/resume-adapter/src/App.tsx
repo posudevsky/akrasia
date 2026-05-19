@@ -159,6 +159,7 @@ function AppContent() {
                 onAdaptSuccess={(resumeUpdated) =>
                   updateState({ step: "adapted", adaptedResume: resumeUpdated })
                 }
+                onBackToUpload={() => updateState({ step: "upload" })}
               />
             </motion.div>
           )}

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./ui/card"
 import { Badge } from "./ui/badge";
 import { Textarea } from "./ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Info, ArrowLeft } from "lucide-react";
 import type { Requirement } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
 
@@ -14,6 +14,7 @@ interface ScreenAnalysisProps {
   state: AppState;
   updateState: (updates: Partial<AppState>) => void;
   onAdaptSuccess: (resumeUpdated: string) => void;
+  onBackToUpload: () => void;
 }
 
 function capitalizeFirst(str: string): string {
@@ -33,7 +34,7 @@ function getScoreMessage(score: number): { heading: string; body: string } {
   }
 }
 
-export default function ScreenAnalysis({ state, updateState, onAdaptSuccess }: ScreenAnalysisProps) {
+export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onBackToUpload }: ScreenAnalysisProps) {
   const { toast } = useToast();
   const adaptMutation = useAdaptResume();
   const requirements = state.analysisResult?.requirements || [];
@@ -219,10 +220,13 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess }: S
         ))}
       </div>
 
-      <div className="flex justify-center pt-4">
-        <Button 
-          size="lg" 
-          onClick={handleAdapt} 
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-4">
+        <Button variant="outline" onClick={onBackToUpload}>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к вставке данных
+        </Button>
+        <Button
+          size="lg"
+          onClick={handleAdapt}
           disabled={adaptMutation.isPending}
           className="w-full sm:w-auto"
         >

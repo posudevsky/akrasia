@@ -1,8 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AppState } from "../App";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Download, FileText, ArrowLeft } from "lucide-react";
+import { Download, FileText, ArrowLeft, Copy, Check, RotateCcw } from "lucide-react";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
 interface ScreenAdaptedProps {
@@ -12,6 +12,8 @@ interface ScreenAdaptedProps {
 }
 
 export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: ScreenAdaptedProps) {
+  const [copied, setCopied] = useState(false);
+
   const originalScore = useMemo(() => {
     const requirements = state.analysisResult?.requirements || [];
     let totalWeight = 0;
@@ -47,11 +49,11 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       if (req.status === "confirmed") {
         score = 1;
       } else if (req.status === "partial") {
-        score = 1; // Assume partials are fixed by adaptation
+        score = 1;
       } else if (req.status === "missing") {
         const answer = state.userAnswers.find(a => a.requirementId === req.id)?.answer;
         if (answer && answer.trim().length > 0) {
-          score = 0.5; // Answered missing → treated as partial
+          score = 0.5;
         }
       }
 
@@ -64,6 +66,27 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
 
   const rawResume = state.adaptedResume || "";
   const plainTextResume = rawResume.replace(/<\/?change>/g, "").replace(/<\/?addition>/g, "");
+
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(plainTextResume);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback for older browsers
+      const ta = document.createElement("textarea");
+      ta.value = plainTextResume;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const handleDownloadTxt = () => {
     const blob = new Blob([plainTextResume], { type: "text/plain;charset=utf-8" });
@@ -83,7 +106,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         sections: [
           {
             properties: {},
-            children: plainTextResume.split("\n").map(line => 
+            children: plainTextResume.split("\n").map(line =>
               new Paragraph({
                 children: [new TextRun(line)],
               })
@@ -119,7 +142,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     type TagType = "change" | "addition" | null;
     let activeTag: TagType = null;
 
-    // Build a flat list of lines; each line holds its rendered nodes and plain text
     type Line = { nodes: React.ReactNode[]; text: string };
     const lines: Line[] = [{ nodes: [], text: "" }];
     let nodeIdx = 0;
@@ -156,20 +178,16 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       });
     }
 
-    // A line is a section header if its trimmed text is entirely uppercase (e.g. "ОПЫТ РАБОТЫ")
     const isSectionHeader = (text: string) => {
       const t = text.trim();
       return t.length > 1 && t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t);
     };
 
-    // Convert ALL CAPS header to sentence-case, preserving Latin acronyms (IT, SQL, API…)
     const toSentenceCase = (text: string) => {
       const words = text.trim().split(/\s+/);
       return words
         .map((word, idx) => {
-          // Keep words that are purely Latin uppercase as acronyms (e.g. IT, SQL, API)
           if (/^[A-Z0-9]+$/.test(word)) return word;
-          // First word: capitalise; rest: lowercase
           return idx === 0
             ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
             : word.toLowerCase();
@@ -186,7 +204,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       const trimmed = line.text.trim();
 
       if (isEmpty) {
-        // Blank separator line → thin gap, not a full line-height paragraph
         textElements.push(<div key={`line-${idx}`} className="h-2" />);
       } else if (isHeader) {
         inSection = true;
@@ -201,8 +218,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
 
-        // Detect title/company lines by content: they contain a pipe separator
-        // or a 4-digit year (e.g. "Google | Senior Dev | 2020–2023")
         const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
         const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
         const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
@@ -223,13 +238,45 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   };
 
   return (
-    <div className="grid gap-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 print:hidden">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Адаптированное резюме</h2>
-          <p className="text-slate-500 mt-1">Соответствие вакансии: <span className="font-medium text-slate-700 dark:text-slate-300">{originalScore}% &rarr; {newScore}%</span></p>
+    <div className="grid gap-4">
+      {/* Header */}
+      <div className="print:hidden">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Адаптированное резюме</h2>
+        <p className="text-slate-500 mt-1">
+          Соответствие вакансии:{" "}
+          <span className="font-medium text-slate-700 dark:text-slate-300">
+            {originalScore}% &rarr; {newScore}%
+          </span>
+        </p>
+      </div>
+
+      {/* Navigation buttons */}
+      <div className="flex justify-between gap-2 print:hidden">
+        <Button variant="outline" onClick={onBackToAnalysis}>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
+        </Button>
+        <Button variant="outline" onClick={onReset}>
+          <RotateCcw className="w-4 h-4 mr-2" /> Начать заново
+        </Button>
+      </div>
+
+      {/* Legend + download buttons */}
+      <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
+        <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            <span style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-2 py-0.5 rounded-sm text-slate-700">Аа</span>
+            <span className="text-slate-600">переформулировано</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-2 py-0.5 rounded-sm text-slate-700">Аа</span>
+            <span className="text-slate-600">добавлено</span>
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={handleCopyToClipboard}>
+            {copied ? <Check className="w-4 h-4 mr-2 text-green-600" /> : <Copy className="w-4 h-4 mr-2" />}
+            {copied ? "Скопировано" : "Скопировать"}
+          </Button>
           <Button variant="outline" size="sm" onClick={handleDownloadTxt}>
             <FileText className="w-4 h-4 mr-2" /> TXT
           </Button>
@@ -242,31 +289,12 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 text-sm print:hidden">
-        <div className="flex items-center gap-2">
-          <span style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-2 py-0.5 rounded-sm text-slate-700">Аа</span>
-          <span className="text-slate-600">переформулировано из резюме</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-2 py-0.5 rounded-sm text-slate-700">Аа</span>
-          <span className="text-slate-600">новый контент</span>
-        </div>
-      </div>
-
+      {/* Resume card */}
       <Card className="shadow-md print:shadow-none print:border-none print:m-0 print:p-0">
         <CardContent className="p-8 text-slate-800 dark:text-slate-200 text-xs leading-snug">
           {renderResumeText()}
         </CardContent>
       </Card>
-
-      <div className="flex justify-between print:hidden pt-4">
-        <Button variant="ghost" onClick={onBackToAnalysis} className="text-slate-500">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
-        </Button>
-        <Button variant="ghost" onClick={onReset} className="text-slate-500">
-          Начать заново
-        </Button>
-      </div>
     </div>
   );
 }
