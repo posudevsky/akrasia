@@ -55,7 +55,11 @@ export default function ScreenLogin({ onLoginSuccess }: ScreenLoginProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[70vh]">
+    <div className="flex flex-col items-center justify-center min-h-[70vh] gap-6">
+      <div className="w-full max-w-sm">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-50">акразия.</h1>
+        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">адаптация резюме к вакансии</p>
+      </div>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">Вход</CardTitle>
