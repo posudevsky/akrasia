@@ -233,7 +233,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         headerCount++;
         prevWasBlank = false;
         textElements.push(
-          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : " mt-2"}`}>
+          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : " mt-3"}`}>
             {toSentenceCase(trimmed)}
           </p>
         );
