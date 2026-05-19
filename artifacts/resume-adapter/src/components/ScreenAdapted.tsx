@@ -178,13 +178,28 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       });
     }
 
-    const isSectionHeader = (text: string) => {
+    const isSectionHeader = (text: string, afterBlank: boolean) => {
       const t = text.trim();
-      return t.length > 1 && t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t);
+      if (t.length <= 1) return false;
+      // All-caps line (e.g. "ОПЫТ РАБОТЫ", "НАВЫКИ")
+      if (t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t)) return true;
+      // Smart detector: short clean line that follows a blank line
+      if (afterBlank) {
+        const words = t.replace(/:$/, "").split(/\s+/);
+        const startsWithBullet = /^[•\-–—*·\d]/.test(t);
+        const hasYear = /\b(19|20)\d{2}\b/.test(t);
+        const hasURL = /https?:\/\/|www\./.test(t);
+        const hasParens = /[()]/.test(t);
+        const hasPipe = /\|/.test(t);
+        if (words.length <= 3 && !startsWithBullet && !hasYear && !hasURL && !hasParens && !hasPipe) {
+          return true;
+        }
+      }
+      return false;
     };
 
     const toSentenceCase = (text: string) => {
-      const words = text.trim().split(/\s+/);
+      const words = text.trim().replace(/:$/, "").split(/\s+/);
       return words
         .map((word, idx) => {
           if (/^[A-Z0-9]+$/.test(word)) return word;
@@ -197,26 +212,30 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
 
     const textElements: React.ReactNode[] = [];
     let firstNonEmptySeen = false;
-    let inSection = false;
+    let prevWasBlank = false;
+    let headerCount = 0;
     lines.forEach((line, idx) => {
-      const isHeader = isSectionHeader(line.text);
       const isEmpty = line.text.trim() === "";
       const trimmed = line.text.trim();
+      const isHeader = isSectionHeader(line.text, prevWasBlank);
 
       if (isEmpty) {
+        prevWasBlank = true;
         textElements.push(<div key={`line-${idx}`} className="h-2" />);
       } else if (isHeader) {
-        inSection = true;
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
+        headerCount++;
+        prevWasBlank = false;
         textElements.push(
-          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : ""}`}>
+          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : " mt-2"}`}>
             {toSentenceCase(trimmed)}
           </p>
         );
       } else {
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
+        prevWasBlank = false;
 
         const nodes: React.ReactNode[] = line.nodes;
 
