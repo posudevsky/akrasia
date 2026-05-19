@@ -117,7 +117,7 @@ export default function ScreenLogin({ onLoginSuccess }: ScreenLoginProps) {
           {waitlistDone ? (
             <div className="py-4 text-center space-y-2">
               <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Готово!</p>
-              <p className="text-sm text-slate-500">Мы сообщим вам о запуске.</p>
+              <p className="text-sm text-slate-500">Мы сообщим вам о публичном запуске.</p>
               <Button variant="outline" className="mt-2" onClick={() => setWaitlistOpen(false)}>
                 Закрыть
               </Button>
