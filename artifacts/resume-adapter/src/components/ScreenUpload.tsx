@@ -218,6 +218,13 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
       </div>
 
       <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          onClick={() => { setVacancyText(TEST_VACANCY); setResumeText(TEST_RESUME); }}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+        >
+          Вставить тестовые данные
+        </button>
         <Button 
           size="lg" 
           onClick={handleAnalyze} 
@@ -227,13 +234,6 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
           {analyzeMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {analyzeMutation.isPending ? "Анализирую соответствие..." : "Анализировать"}
         </Button>
-        <button
-          type="button"
-          onClick={() => { setVacancyText(TEST_VACANCY); setResumeText(TEST_RESUME); }}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
-        >
-          Вставить тестовые данные
-        </button>
       </div>
     </div>
   );
