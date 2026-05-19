@@ -178,28 +178,16 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       });
     }
 
-    const KNOWN_SECTIONS = /^(опыт работы|навыки|образование|курсы|сертификаты|достижения|цель|о себе|обо мне|контакты|языки|проекты|дополнительно|дополнительное образование|рекомендации|experience|skills|education|summary|achievements|languages|certifications|about)$/i;
+    const KNOWN_SECTIONS = /^(опыт работы|профессиональный опыт|трудовой опыт|навыки|ключевые навыки|профессиональные навыки|технические навыки|образование|высшее образование|дополнительное образование|курсы|курсы и сертификаты|сертификаты|сертификации|достижения|ключевые достижения|профессиональные достижения|цель|о себе|обо мне|краткое резюме|контакты|контактная информация|языки|иностранные языки|проекты|ключевые проекты|дополнительно|рекомендации|волонтёрство|волонтерство|публикации|конференции|участие в конференциях|experience|work experience|professional experience|skills|key skills|education|additional education|courses|certifications|achievements|summary|about|about me|contacts|languages|projects|additional|recommendations|volunteering|publications)$/i;
 
-    const isSectionHeader = (text: string, afterBlank: boolean) => {
+    const isSectionHeader = (text: string, _afterBlank: boolean) => {
       const t = text.trim();
       if (t.length <= 1) return false;
       // All-caps line (e.g. "ОПЫТ РАБОТЫ", "НАВЫКИ")
       if (t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t)) return true;
-      // Known section names — always recognised regardless of blank lines
+      // Known section names
       const tNaked = t.replace(/:$/, "");
       if (KNOWN_SECTIONS.test(tNaked)) return true;
-      // Smart detector: short clean line that follows a blank line
-      if (afterBlank) {
-        const words = tNaked.split(/\s+/);
-        const startsWithBullet = /^[•\-–—*·\d]/.test(t);
-        const hasYear = /\b(19|20)\d{2}\b/.test(t);
-        const hasURL = /https?:\/\/|www\./.test(t);
-        const hasParens = /[()]/.test(t);
-        const hasPipe = /\|/.test(t);
-        if (words.length <= 3 && !startsWithBullet && !hasYear && !hasURL && !hasParens && !hasPipe) {
-          return true;
-        }
-      }
       return false;
     };
 
