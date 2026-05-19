@@ -218,13 +218,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
 
-        const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
-        const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
-        const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
-
-        const nodes: React.ReactNode[] = shouldBullet
-          ? [<span key="bullet">– </span>, ...line.nodes]
-          : line.nodes;
+        const nodes: React.ReactNode[] = line.nodes;
 
         textElements.push(
           <p key={`line-${idx}`} className={`leading-snug mb-0${isName ? " font-bold text-sm" : ""}`}>
