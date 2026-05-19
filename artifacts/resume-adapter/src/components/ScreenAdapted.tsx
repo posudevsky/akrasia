@@ -131,47 +131,26 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   const renderResumeText = () => {
     if (!state.adaptedResume) return null;
 
-    const parts = state.adaptedResume.split(/(<change>|<\/change>|<addition>|<\/addition>)/);
-
     type TagType = "change" | "addition" | null;
+    type Chunk = { text: string; tag: TagType };
+    type Line = { chunks: Chunk[]; rawText: string };
+
+    const parts = state.adaptedResume.split(/(<change>|<\/change>|<addition>|<\/addition>)/);
     let activeTag: TagType = null;
+    const lines: Line[] = [{ chunks: [], rawText: "" }];
 
-    type Line = { nodes: React.ReactNode[]; text: string; lineTag: TagType | "mixed" };
-    const lines: Line[] = [{ nodes: [], text: "", lineTag: null }];
-    let nodeIdx = 0;
-
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
+    for (const part of parts) {
       if (part === "<change>") { activeTag = "change"; continue; }
       if (part === "</change>") { activeTag = null; continue; }
       if (part === "<addition>") { activeTag = "addition"; continue; }
       if (part === "</addition>") { activeTag = null; continue; }
       if (!part) continue;
 
-      const sublines = part.split("\n");
-      sublines.forEach((subline, subIdx) => {
-        if (subIdx > 0) lines.push({ nodes: [], text: "", lineTag: null });
+      part.split("\n").forEach((subline, subIdx) => {
+        if (subIdx > 0) lines.push({ chunks: [], rawText: "" });
         const cur = lines[lines.length - 1];
-        cur.text += subline;
-        if (activeTag && subline) {
-          if (cur.lineTag === null) cur.lineTag = activeTag;
-          else if (cur.lineTag !== activeTag) cur.lineTag = "mixed";
-        }
-        if (activeTag === "change") {
-          cur.nodes.push(
-            <span key={`n-${nodeIdx++}`} style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-0.5 rounded-sm">
-              {subline}
-            </span>
-          );
-        } else if (activeTag === "addition") {
-          cur.nodes.push(
-            <span key={`n-${nodeIdx++}`} style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-0.5 rounded-sm">
-              {subline}
-            </span>
-          );
-        } else if (subline) {
-          cur.nodes.push(<span key={`n-${nodeIdx++}`}>{subline}</span>);
-        }
+        cur.rawText += subline;
+        if (subline) cur.chunks.push({ text: subline, tag: activeTag });
       });
     }
 
@@ -180,56 +159,75 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       return t.length > 1 && t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t);
     };
 
-    const toSentenceCase = (text: string) => {
-      const words = text.trim().split(/\s+/);
-      return words.map((word, idx) => {
+    const toSentenceCase = (text: string) =>
+      text.trim().split(/\s+/).map((word, idx) => {
         if (/^[A-Z0-9]+$/.test(word)) return word;
         return idx === 0
           ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
           : word.toLowerCase();
       }).join(" ");
+
+    const changeStyle = { backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" };
+    const additionStyle = { backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" };
+
+    const chunkToSpan = (chunk: Chunk, key: string) => {
+      if (chunk.tag === "change")
+        return <span key={key} style={changeStyle} className="px-0.5 rounded-sm">{chunk.text}</span>;
+      if (chunk.tag === "addition")
+        return <span key={key} style={additionStyle} className="px-0.5 rounded-sm">{chunk.text}</span>;
+      return <span key={key}>{chunk.text}</span>;
     };
 
     const textElements: React.ReactNode[] = [];
     let firstNonEmptySeen = false;
     let inSection = false;
-    lines.forEach((line, idx) => {
-      const isHeader = isSectionHeader(line.text);
-      const isEmpty = line.text.trim() === "";
-      const trimmed = line.text.trim();
+
+    lines.forEach((line, lineIdx) => {
+      const trimmed = line.rawText.trim();
+      const isEmpty = !trimmed;
+      const isHeader = isSectionHeader(trimmed);
 
       if (isEmpty) {
-        textElements.push(<div key={`line-${idx}`} className="h-2" />);
-      } else if (isHeader) {
+        textElements.push(<div key={`line-${lineIdx}`} className="h-2" />);
+        return;
+      }
+
+      if (isHeader) {
         inSection = true;
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
         textElements.push(
-          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : ""}`}>
+          <p key={`line-${lineIdx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : ""}`}>
             {toSentenceCase(trimmed)}
           </p>
         );
-      } else {
-        const isName = !firstNonEmptySeen;
-        firstNonEmptySeen = true;
-        const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
-        const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
-        const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
-        const bulletNode = (() => {
-          if (!shouldBullet) return null;
-          if (line.lineTag === "addition")
-            return <span key="bullet" style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-0.5 rounded-sm">– </span>;
-          if (line.lineTag === "change")
-            return <span key="bullet" style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-0.5 rounded-sm">– </span>;
-          return <span key="bullet">– </span>;
-        })();
-        const nodes: React.ReactNode[] = bulletNode ? [bulletNode, ...line.nodes] : line.nodes;
-        textElements.push(
-          <p key={`line-${idx}`} className={`leading-snug mb-0${isName ? " font-bold text-sm" : ""}`}>
-            {nodes}
-          </p>
-        );
+        return;
       }
+
+      const isName = !firstNonEmptySeen;
+      firstNonEmptySeen = true;
+      const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
+      const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
+      const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
+
+      // Build nodes: if bulleting, prepend "– " into the first chunk's span
+      // so bullet and text share one continuous highlight block
+      let chunks = line.chunks;
+      if (shouldBullet) {
+        if (chunks.length > 0) {
+          chunks = [{ text: "– " + chunks[0].text, tag: chunks[0].tag }, ...chunks.slice(1)];
+        } else {
+          chunks = [{ text: "– ", tag: null }];
+        }
+      }
+
+      const nodes = chunks.map((chunk, i) => chunkToSpan(chunk, `chunk-${lineIdx}-${i}`));
+
+      textElements.push(
+        <p key={`line-${lineIdx}`} className={`leading-snug mb-0${isName ? " font-bold text-sm" : ""}`}>
+          {nodes}
+        </p>
+      );
     });
 
     return <div className="whitespace-pre-wrap">{textElements}</div>;
