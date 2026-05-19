@@ -178,21 +178,13 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       });
     }
 
-    const KNOWN_SECTIONS = /^(опыт работы|профессиональный опыт|трудовой опыт|навыки|ключевые навыки|профессиональные навыки|технические навыки|образование|высшее образование|дополнительное образование|курсы|курсы и сертификаты|сертификаты|сертификации|достижения|ключевые достижения|профессиональные достижения|цель|о себе|обо мне|краткое резюме|контакты|контактная информация|языки|иностранные языки|проекты|ключевые проекты|дополнительно|рекомендации|волонтёрство|волонтерство|публикации|конференции|участие в конференциях|experience|work experience|professional experience|skills|key skills|education|additional education|courses|certifications|achievements|summary|about|about me|contacts|languages|projects|additional|recommendations|volunteering|publications)$/i;
-
-    const isSectionHeader = (text: string, _afterBlank: boolean) => {
+    const isSectionHeader = (text: string) => {
       const t = text.trim();
-      if (t.length <= 1) return false;
-      // All-caps line (e.g. "ОПЫТ РАБОТЫ", "НАВЫКИ")
-      if (t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t)) return true;
-      // Known section names
-      const tNaked = t.replace(/:$/, "");
-      if (KNOWN_SECTIONS.test(tNaked)) return true;
-      return false;
+      return t.length > 1 && t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t);
     };
 
     const toSentenceCase = (text: string) => {
-      const words = text.trim().replace(/:$/, "").split(/\s+/);
+      const words = text.trim().split(/\s+/);
       return words
         .map((word, idx) => {
           if (/^[A-Z0-9]+$/.test(word)) return word;
@@ -205,30 +197,26 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
 
     const textElements: React.ReactNode[] = [];
     let firstNonEmptySeen = false;
-    let prevWasBlank = false;
-    let headerCount = 0;
+    let inSection = false;
     lines.forEach((line, idx) => {
+      const isHeader = isSectionHeader(line.text);
       const isEmpty = line.text.trim() === "";
       const trimmed = line.text.trim();
-      const isHeader = isSectionHeader(line.text, prevWasBlank);
 
       if (isEmpty) {
-        prevWasBlank = true;
         textElements.push(<div key={`line-${idx}`} className="h-2" />);
       } else if (isHeader) {
+        inSection = true;
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
-        headerCount++;
-        prevWasBlank = false;
         textElements.push(
-          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : " mt-3"}`}>
+          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : ""}`}>
             {toSentenceCase(trimmed)}
           </p>
         );
       } else {
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
-        prevWasBlank = false;
 
         const nodes: React.ReactNode[] = line.nodes;
 
