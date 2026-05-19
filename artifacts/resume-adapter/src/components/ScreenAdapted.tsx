@@ -236,7 +236,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       {/* Header */}
       <div className="print:hidden">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Адаптированное резюме</h2>
-        <p className="text-slate-500 mt-1">
+        <p className="text-slate-500 mt-4">
           Соответствие вакансии:{" "}
           <span className="font-medium text-slate-700 dark:text-slate-300">
             {originalScore}% &rarr; {newScore}%
