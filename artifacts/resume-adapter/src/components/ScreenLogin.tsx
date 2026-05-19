@@ -108,9 +108,9 @@ export default function ScreenLogin({ onLoginSuccess }: ScreenLoginProps) {
       <Dialog open={waitlistOpen} onOpenChange={setWaitlistOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>Закрытое тестирование</DialogTitle>
+            <DialogTitle>Закрытое бета-тестирование</DialogTitle>
             <DialogDescription>
-              Сейчас акразия работает в режиме закрытого бета-тестирования. Оставьте свой email — мы уведомим вас, когда откроем доступ.
+              Сейчас Акразия работает в режиме закрытого бета-тестирования. Оставьте свой email — мы сообщим вам о публичном запуске.
             </DialogDescription>
           </DialogHeader>
 
