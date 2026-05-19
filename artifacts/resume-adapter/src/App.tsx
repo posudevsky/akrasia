@@ -214,7 +214,7 @@ function AppContent() {
                     onAdaptSuccess={(resumeUpdated, matchScore) =>
                       updateState({ step: "adapted", adaptedResume: resumeUpdated, matchScore, activeHistoryId: null })
                     }
-                    onBackToUpload={() => updateState({ step: "upload" })}
+                    onBackToUpload={() => updateState({ step: "upload", userAnswers: [], analysisResult: null, adaptedResume: null })}
                   />
                 </motion.div>
               )}
