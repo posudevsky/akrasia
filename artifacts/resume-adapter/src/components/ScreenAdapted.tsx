@@ -4,7 +4,6 @@ import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Download, FileText, ArrowLeft } from "lucide-react";
 import { Document, Packer, Paragraph, TextRun } from "docx";
-import { saveAs } from "file-saver"; // Usually we'd use this, but we can just use native Blob
 
 interface ScreenAdaptedProps {
   state: AppState;

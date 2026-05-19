@@ -53,3 +53,118 @@ export const AdaptResumeBody = zod.object({
 export const AdaptResumeResponse = zod.object({
   resumeUpdated: zod.string(),
 });
+
+/**
+ * @summary Login with email and password
+ */
+export const LoginBody = zod.object({
+  email: zod.string(),
+  password: zod.string(),
+});
+
+export const LoginResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+});
+
+/**
+ * @summary Logout current user
+ */
+export const LogoutResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
+ * @summary Get current authenticated user
+ */
+export const GetMeResponse = zod.object({
+  id: zod.number(),
+  email: zod.string(),
+});
+
+/**
+ * @summary Join the waitlist
+ */
+export const JoinWaitlistBody = zod.object({
+  email: zod.string(),
+});
+
+export const JoinWaitlistResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
+ * @summary Verify admin password
+ */
+export const VerifyAdminBody = zod.object({
+  password: zod.string(),
+});
+
+export const VerifyAdminResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
+ * @summary Get waitlist emails
+ */
+export const GetAdminWaitlistHeader = zod.object({
+  "x-admin-password": zod.string(),
+});
+
+export const GetAdminWaitlistResponse = zod.object({
+  entries: zod.array(
+    zod.object({
+      id: zod.number(),
+      email: zod.string(),
+      createdAt: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * @summary Get invited users
+ */
+export const GetAdminUsersHeader = zod.object({
+  "x-admin-password": zod.string(),
+});
+
+export const GetAdminUsersResponse = zod.object({
+  users: zod.array(
+    zod.object({
+      id: zod.number(),
+      email: zod.string(),
+      createdAt: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * @summary Create an invited user
+ */
+export const CreateAdminUserHeader = zod.object({
+  "x-admin-password": zod.string(),
+});
+
+export const CreateAdminUserBody = zod.object({
+  email: zod.string(),
+  password: zod.string(),
+});
+
+export const CreateAdminUserResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
+ * @summary Delete an invited user
+ */
+export const DeleteAdminUserParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteAdminUserHeader = zod.object({
+  "x-admin-password": zod.string(),
+});
+
+export const DeleteAdminUserResponse = zod.object({
+  ok: zod.boolean(),
+});

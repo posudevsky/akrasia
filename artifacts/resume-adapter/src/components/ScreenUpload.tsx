@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useAnalyzeResume } from "@workspace/api-client-react";
-import { AnalyzeResult } from "@workspace/api-client-react/src/generated/api.schemas";
+import type { AnalyzeResult } from "@workspace/api-client-react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";

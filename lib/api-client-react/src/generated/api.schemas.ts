@@ -60,3 +60,50 @@ export interface AdaptResult {
 export interface ErrorResponse {
   error: string;
 }
+
+export interface SuccessResponse {
+  ok: boolean;
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface AuthUser {
+  id: number;
+  email: string;
+}
+
+export interface WaitlistInput {
+  email: string;
+}
+
+export interface AdminVerifyInput {
+  password: string;
+}
+
+export interface WaitlistEntry {
+  id: number;
+  email: string;
+  createdAt: string;
+}
+
+export interface WaitlistList {
+  entries: WaitlistEntry[];
+}
+
+export interface UserEntry {
+  id: number;
+  email: string;
+  createdAt: string;
+}
+
+export interface UserList {
+  users: UserEntry[];
+}
+
+export interface CreateUserInput {
+  email: string;
+  password: string;
+}

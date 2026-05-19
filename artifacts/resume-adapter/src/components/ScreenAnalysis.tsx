@@ -8,7 +8,7 @@ import { Textarea } from "./ui/textarea";
 import { Progress } from "./ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle2, AlertCircle, Info } from "lucide-react";
-import { Requirement } from "@workspace/api-client-react/src/generated/api.schemas";
+import type { Requirement } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
 
 interface ScreenAnalysisProps {
