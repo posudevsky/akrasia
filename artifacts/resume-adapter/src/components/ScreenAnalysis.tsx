@@ -155,7 +155,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess }: S
               <CardContent>
                 <Textarea
                   placeholder="Есть такой опыт? Расскажите кратко — где применяли (компания, проект) или на каком уровне владеете навыком."
-                  className="bg-white border-red-100 focus-visible:ring-red-400"
+                  className="bg-white border-red-100 focus-visible:ring-red-400 text-sm"
                   style={{ height: "60px", minHeight: "60px", resize: "none" }}
                   value={state.userAnswers.find(a => a.requirementId === req.id)?.answer || ""}
                   onChange={(e) => handleAnswerChange(req.id, e.target.value)}
