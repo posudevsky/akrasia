@@ -78,6 +78,63 @@ router.post("/adapt", async (req, res): Promise<void> => {
   }
 });
 
+function htmlToStructuredText(html: string): string {
+  let text = html;
+
+  // Headings → uppercase + double newline
+  text = text.replace(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/gi, (_m, inner) => {
+    const content = inner.replace(/<[^>]+>/g, "").trim().toUpperCase();
+    return content ? `\n${content}\n` : "";
+  });
+
+  // List items → "– " prefix
+  text = text.replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, (_m, inner) => {
+    const content = inner.replace(/<[^>]+>/g, "").trim();
+    return content ? `– ${content}\n` : "";
+  });
+
+  // Paragraphs and block-level divs → newline after
+  text = text.replace(/<\/(p|div|ul|ol|blockquote)>/gi, "\n");
+
+  // Line breaks
+  text = text.replace(/<br\s*\/?>/gi, "\n");
+
+  // Strip remaining tags
+  text = text.replace(/<[^>]+>/g, "");
+
+  // Decode common HTML entities
+  text = text
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+
+  // Collapse runs of 3+ newlines to 2
+  text = text.replace(/\n{3,}/g, "\n\n");
+
+  // Trim trailing spaces on each line
+  text = text.split("\n").map((l) => l.trimEnd()).join("\n");
+
+  return text.trim();
+}
+
+function normalizePdfText(raw: string): string {
+  let text = raw;
+
+  // Collapse runs of spaces/tabs (but preserve newlines)
+  text = text.replace(/[ \t]{2,}/g, " ");
+
+  // Collapse runs of 3+ newlines to 2
+  text = text.replace(/\n{3,}/g, "\n\n");
+
+  // Trim trailing spaces on each line
+  text = text.split("\n").map((l) => l.trimEnd()).join("\n");
+
+  return text.trim();
+}
+
 router.post("/parse-file", upload.single("file"), async (req, res): Promise<void> => {
   if (!req.file) {
     res.status(400).json({ error: "Файл не загружен" });
@@ -89,8 +146,9 @@ router.post("/parse-file", upload.single("file"), async (req, res): Promise<void
 
   try {
     if (mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || ext === "docx") {
-      const result = await mammoth.extractRawText({ buffer });
-      res.json({ text: result.value.trim() });
+      const result = await mammoth.convertToHtml({ buffer });
+      const text = htmlToStructuredText(result.value);
+      res.json({ text });
       return;
     }
 
@@ -101,7 +159,7 @@ router.post("/parse-file", upload.single("file"), async (req, res): Promise<void
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
       const result = await pdfParse(buffer);
-      res.json({ text: result.text.trim() });
+      res.json({ text: normalizePdfText(result.text) });
       return;
     }
 
