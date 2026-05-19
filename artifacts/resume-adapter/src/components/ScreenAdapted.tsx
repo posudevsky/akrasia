@@ -232,17 +232,16 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   };
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-3">
       {/* Header */}
-      <div className="print:hidden">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Адаптированное резюме</h2>
-        <p className="text-slate-500 mt-4">
-          Соответствие вакансии:{" "}
-          <span className="font-medium text-slate-700 dark:text-slate-300">
-            {originalScore}% &rarr; {newScore}%
-          </span>
-        </p>
-      </div>
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-white print:hidden">Адаптированное резюме</h2>
+
+      <p className="text-slate-500 print:hidden">
+        Соответствие вакансии:{" "}
+        <span className="font-medium text-slate-700 dark:text-slate-300">
+          {originalScore}% &rarr; {newScore}%
+        </span>
+      </p>
 
       {/* Legend + download buttons */}
       <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
