@@ -143,7 +143,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
                 <div className="flex justify-between items-start gap-4">
                   <p className="font-medium text-foreground text-sm leading-snug">{capitalizeFirst(req.text)}</p>
                   <div className="flex gap-2 shrink-0">
-                    <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-[#4A355E] hover:bg-[#3a2a4e]" : ""}>
+                    <Badge className={req.criticality === "must" ? "bg-gray-500 hover:bg-gray-500 text-white border-transparent" : "bg-gray-200 hover:bg-gray-200 text-gray-600 border-transparent"}>
                       {req.criticality === "must" ? "обязательное требование" : "желательное требование"}
                     </Badge>
                     <Badge className="flex items-center gap-1 bg-[#C96875] hover:bg-[#b85d6a] text-white border-transparent">
@@ -183,7 +183,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-[#4A355E] hover:bg-[#3a2a4e]" : ""}>
+                  <Badge className={req.criticality === "must" ? "bg-gray-500 hover:bg-gray-500 text-white border-transparent" : "bg-gray-200 hover:bg-gray-200 text-gray-600 border-transparent"}>
                     {req.criticality === "must" ? "обязательное требование" : "желательное требование"}
                   </Badge>
                   <Badge variant="outline" className="bg-[#F0E4B0] text-[#7A5C10] border-[#E5D5A0]">
@@ -206,7 +206,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
               <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <p className="font-medium text-foreground text-sm flex-1">{capitalizeFirst(req.text)}</p>
                 <div className="flex gap-2 shrink-0">
-                  <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-[#4A355E] hover:bg-[#3a2a4e]" : ""}>
+                  <Badge className={req.criticality === "must" ? "bg-gray-500 hover:bg-gray-500 text-white border-transparent" : "bg-gray-200 hover:bg-gray-200 text-gray-600 border-transparent"}>
                     {req.criticality === "must" ? "обязательное требование" : "желательное требование"}
                   </Badge>
                   <Badge variant="outline" className="bg-[#D4EADB] text-[#2D6644] border-[#BAD4C2] flex items-center gap-1">
