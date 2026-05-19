@@ -59,7 +59,7 @@ export default function ScreenLogin({ onLoginSuccess }: ScreenLoginProps) {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">Вход</CardTitle>
-          <CardDescription>Войдите в свой аккаунт для работы с резюме</CardDescription>
+          <CardDescription>Войдите в свой аккаунт для начала работы</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
