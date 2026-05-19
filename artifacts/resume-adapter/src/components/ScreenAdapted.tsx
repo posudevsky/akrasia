@@ -1,18 +1,26 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { AppState } from "../App";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Download, FileText, ArrowLeft, Copy, Check, RotateCcw } from "lucide-react";
 import { Document, Packer, Paragraph, TextRun } from "docx";
+import { useCreateHistory } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScreenAdaptedProps {
   state: AppState;
   onReset: () => void;
   onBackToAnalysis: () => void;
+  onSaved: (id: number) => void;
 }
 
-export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: ScreenAdaptedProps) {
+export default function ScreenAdapted({ state, onReset, onBackToAnalysis, onSaved }: ScreenAdaptedProps) {
   const [copied, setCopied] = useState(false);
+  const savedRef = useRef(false);
+  const queryClient = useQueryClient();
+  const createHistoryMutation = useCreateHistory();
+  const { toast } = useToast();
 
   const originalScore = useMemo(() => {
     const requirements = state.analysisResult?.requirements || [];
@@ -37,6 +45,9 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   }, [state.analysisResult]);
 
   const newScore = useMemo(() => {
+    if (state.matchScore !== null && state.matchScore !== undefined && !state.analysisResult) {
+      return state.matchScore;
+    }
     const requirements = state.analysisResult?.requirements || [];
     let totalWeight = 0;
     let earnedWeight = 0;
@@ -60,9 +71,42 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       earnedWeight += weight * score;
     });
 
-    if (totalWeight === 0) return 0;
+    if (totalWeight === 0) return state.matchScore ?? 0;
     return Math.round((earnedWeight / totalWeight) * 100);
-  }, [state.analysisResult, state.userAnswers]);
+  }, [state.analysisResult, state.userAnswers, state.matchScore]);
+
+  useEffect(() => {
+    if (savedRef.current) return;
+    if (state.activeHistoryId) return;
+    if (!state.adaptedResume || !state.vacancyText || !state.resumeText) return;
+
+    createHistoryMutation.mutate(
+      {
+        data: {
+          vacancyText: state.vacancyText,
+          resumeText: state.resumeText,
+          adaptedResume: state.adaptedResume,
+          matchScore: newScore,
+        },
+      },
+      {
+        onSuccess: (entry) => {
+          savedRef.current = true;
+          onSaved(entry.id);
+        },
+        onError: () => {
+          savedRef.current = false;
+          toast({
+            title: "Не удалось сохранить в историю",
+            description: "Резюме адаптировано успешно, но запись в историю не сохранилась.",
+            variant: "destructive",
+          });
+        },
+      }
+    );
+
+    savedRef.current = true;
+  }, []);
 
   const rawResume = state.adaptedResume || "";
   const plainTextResume = rawResume.replace(/<\/?change>/g, "").replace(/<\/?addition>/g, "");
@@ -73,7 +117,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // fallback for older browsers
       const ta = document.createElement("textarea");
       ta.value = plainTextResume;
       ta.style.position = "fixed";
@@ -133,7 +176,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     window.print();
   };
 
-  // Parse text to render <change> and <addition> spans with distinct colours
   const renderResumeText = () => {
     if (!state.adaptedResume) return null;
 
@@ -197,7 +239,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
 
     const textElements: React.ReactNode[] = [];
     let firstNonEmptySeen = false;
-    let inSection = false;
     lines.forEach((line, idx) => {
       const isHeader = isSectionHeader(line.text);
       const isEmpty = line.text.trim() === "";
@@ -206,7 +247,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       if (isEmpty) {
         textElements.push(<div key={`line-${idx}`} className="h-2" />);
       } else if (isHeader) {
-        inSection = true;
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
         textElements.push(
@@ -231,19 +271,25 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     return <div className="whitespace-pre-wrap">{textElements}</div>;
   };
 
+  const isFromHistory = !state.analysisResult;
+
   return (
     <div className="grid gap-3">
-      {/* Header */}
       <h2 className="text-2xl font-bold text-slate-900 dark:text-white print:hidden">Адаптированное резюме</h2>
 
       <p className="text-slate-500 print:hidden">
-        Соответствие вакансии:{" "}
-        <span className="font-medium text-slate-700 dark:text-slate-300">
-          {originalScore}% &rarr; {newScore}%
-        </span>
+        {isFromHistory ? (
+          <>Соответствие вакансии: <span className="font-medium text-slate-700 dark:text-slate-300">{newScore}%</span></>
+        ) : (
+          <>
+            Соответствие вакансии:{" "}
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              {originalScore}% &rarr; {newScore}%
+            </span>
+          </>
+        )}
       </p>
 
-      {/* Legend + download buttons */}
       <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
@@ -272,19 +318,19 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         </div>
       </div>
 
-      {/* Resume card */}
       <Card className="shadow-md mt-1 print:shadow-none print:border-none print:m-0 print:p-0">
         <CardContent className="p-8 text-slate-800 dark:text-slate-200 text-xs leading-snug">
           {renderResumeText()}
         </CardContent>
       </Card>
 
-      {/* Navigation buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2 print:hidden">
-        <Button variant="outline" onClick={onBackToAnalysis}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
-        </Button>
-        <Button variant="outline" onClick={onReset}>
+        {!isFromHistory && (
+          <Button variant="outline" onClick={onBackToAnalysis}>
+            <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
+          </Button>
+        )}
+        <Button variant="outline" onClick={onReset} className={isFromHistory ? "w-full sm:w-auto" : ""}>
           <RotateCcw className="w-4 h-4 mr-2" /> Начать заново
         </Button>
       </div>

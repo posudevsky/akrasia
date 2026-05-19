@@ -16,6 +16,8 @@ tags:
     description: Authentication operations
   - name: admin
     description: Admin operations
+  - name: history
+    description: Adaptation history operations
 paths:
   /healthz:
     get:
@@ -289,6 +291,112 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /history:
+    post:
+      operationId: createHistory
+      tags: [history]
+      summary: Save an adaptation to history
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHistoryInput"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryEntry"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      operationId: getHistory
+      tags: [history]
+      summary: Get adaptation history for current user
+      responses:
+        "200":
+          description: History list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryList"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /history/{id}:
+    get:
+      operationId: getHistoryById
+      tags: [history]
+      summary: Get a single history entry by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: History entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryEntryFull"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteHistory
+      tags: [history]
+      summary: Delete a history entry by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /admin/users/{id}:
     delete:
       operationId: deleteAdminUser
@@ -504,3 +612,69 @@ components:
       required:
         - email
         - password
+    CreateHistoryInput:
+      type: object
+      properties:
+        vacancyText:
+          type: string
+        resumeText:
+          type: string
+        adaptedResume:
+          type: string
+        matchScore:
+          type: integer
+      required:
+        - vacancyText
+        - resumeText
+        - adaptedResume
+        - matchScore
+    HistoryEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        vacancySnippet:
+          type: string
+        matchScore:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - vacancySnippet
+        - matchScore
+        - createdAt
+    HistoryEntryFull:
+      type: object
+      properties:
+        id:
+          type: integer
+        vacancySnippet:
+          type: string
+        vacancyText:
+          type: string
+        resumeText:
+          type: string
+        adaptedResume:
+          type: string
+        matchScore:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - vacancySnippet
+        - vacancyText
+        - resumeText
+        - adaptedResume
+        - matchScore
+        - createdAt
+    HistoryList:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryEntry"
+      required:
+        - entries

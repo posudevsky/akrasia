@@ -107,3 +107,31 @@ export interface CreateUserInput {
   email: string;
   password: string;
 }
+
+export interface CreateHistoryInput {
+  vacancyText: string;
+  resumeText: string;
+  adaptedResume: string;
+  matchScore: number;
+}
+
+export interface HistoryEntry {
+  id: number;
+  vacancySnippet: string;
+  matchScore: number;
+  createdAt: string;
+}
+
+export interface HistoryEntryFull {
+  id: number;
+  vacancySnippet: string;
+  vacancyText: string;
+  resumeText: string;
+  adaptedResume: string;
+  matchScore: number;
+  createdAt: string;
+}
+
+export interface HistoryList {
+  entries: HistoryEntry[];
+}

@@ -23,9 +23,13 @@ import type {
   AnalyzeInput,
   AnalyzeResult,
   AuthUser,
+  CreateHistoryInput,
   CreateUserInput,
   ErrorResponse,
   HealthStatus,
+  HistoryEntry,
+  HistoryEntryFull,
+  HistoryList,
   LoginInput,
   SuccessResponse,
   UserList,
@@ -928,6 +932,338 @@ export const useCreateAdminUser = <
   TContext
 > => {
   return useMutation(getCreateAdminUserMutationOptions(options));
+};
+
+/**
+ * @summary Save an adaptation to history
+ */
+export const getCreateHistoryUrl = () => {
+  return `/api/history`;
+};
+
+export const createHistory = async (
+  createHistoryInput: CreateHistoryInput,
+  options?: RequestInit,
+): Promise<HistoryEntry> => {
+  return customFetch<HistoryEntry>(getCreateHistoryUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createHistoryInput),
+  });
+};
+
+export const getCreateHistoryMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createHistory>>,
+    TError,
+    { data: BodyType<CreateHistoryInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createHistory>>,
+  TError,
+  { data: BodyType<CreateHistoryInput> },
+  TContext
+> => {
+  const mutationKey = ["createHistory"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createHistory>>,
+    { data: BodyType<CreateHistoryInput> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createHistory(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateHistoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createHistory>>
+>;
+export type CreateHistoryMutationBody = BodyType<CreateHistoryInput>;
+export type CreateHistoryMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Save an adaptation to history
+ */
+export const useCreateHistory = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createHistory>>,
+    TError,
+    { data: BodyType<CreateHistoryInput> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createHistory>>,
+  TError,
+  { data: BodyType<CreateHistoryInput> },
+  TContext
+> => {
+  return useMutation(getCreateHistoryMutationOptions(options));
+};
+
+/**
+ * @summary Get adaptation history for current user
+ */
+export const getGetHistoryUrl = () => {
+  return `/api/history`;
+};
+
+export const getHistory = async (
+  options?: RequestInit,
+): Promise<HistoryList> => {
+  return customFetch<HistoryList>(getGetHistoryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetHistoryQueryKey = () => {
+  return [`/api/history`] as const;
+};
+
+export const getGetHistoryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getHistory>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getHistory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetHistoryQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getHistory>>> = ({
+    signal,
+  }) => getHistory({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getHistory>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetHistoryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getHistory>>
+>;
+export type GetHistoryQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get adaptation history for current user
+ */
+
+export function useGetHistory<
+  TData = Awaited<ReturnType<typeof getHistory>>,
+  TError = ErrorType<ErrorResponse>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getHistory>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetHistoryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get a single history entry by ID
+ */
+export const getGetHistoryByIdUrl = (id: number) => {
+  return `/api/history/${id}`;
+};
+
+export const getHistoryById = async (
+  id: number,
+  options?: RequestInit,
+): Promise<HistoryEntryFull> => {
+  return customFetch<HistoryEntryFull>(getGetHistoryByIdUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetHistoryByIdQueryKey = (id: number) => {
+  return [`/api/history/${id}`] as const;
+};
+
+export const getGetHistoryByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getHistoryById>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getHistoryById>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetHistoryByIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getHistoryById>>> = ({
+    signal,
+  }) => getHistoryById(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getHistoryById>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetHistoryByIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getHistoryById>>
+>;
+export type GetHistoryByIdQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get a single history entry by ID
+ */
+
+export function useGetHistoryById<
+  TData = Awaited<ReturnType<typeof getHistoryById>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getHistoryById>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetHistoryByIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Delete a history entry by ID
+ */
+export const getDeleteHistoryUrl = (id: number) => {
+  return `/api/history/${id}`;
+};
+
+export const deleteHistory = async (
+  id: number,
+  options?: RequestInit,
+): Promise<SuccessResponse> => {
+  return customFetch<SuccessResponse>(getDeleteHistoryUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteHistoryMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteHistory>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteHistory>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteHistory"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteHistory>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteHistory(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteHistoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteHistory>>
+>;
+
+export type DeleteHistoryMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Delete a history entry by ID
+ */
+export const useDeleteHistory = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteHistory>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteHistory>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteHistoryMutationOptions(options));
 };
 
 /**

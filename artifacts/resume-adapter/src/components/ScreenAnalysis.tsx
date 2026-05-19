@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 interface ScreenAnalysisProps {
   state: AppState;
   updateState: (updates: Partial<AppState>) => void;
-  onAdaptSuccess: (resumeUpdated: string) => void;
+  onAdaptSuccess: (resumeUpdated: string, matchScore: number) => void;
   onBackToUpload: () => void;
 }
 
@@ -85,7 +85,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
       { data: { vacancyText: state.vacancyText, resumeText: state.resumeText, userAnswers: answersToSend } },
       {
         onSuccess: (data) => {
-          onAdaptSuccess(data.resumeUpdated);
+          onAdaptSuccess(data.resumeUpdated, currentScore);
         },
         onError: () => {
           toast({

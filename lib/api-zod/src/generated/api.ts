@@ -155,6 +155,65 @@ export const CreateAdminUserResponse = zod.object({
 });
 
 /**
+ * @summary Save an adaptation to history
+ */
+export const CreateHistoryBody = zod.object({
+  vacancyText: zod.string(),
+  resumeText: zod.string(),
+  adaptedResume: zod.string(),
+  matchScore: zod.number(),
+});
+
+export const CreateHistoryResponse = zod.object({
+  id: zod.number(),
+  vacancySnippet: zod.string(),
+  matchScore: zod.number(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Get adaptation history for current user
+ */
+export const GetHistoryResponse = zod.object({
+  entries: zod.array(
+    zod.object({
+      id: zod.number(),
+      vacancySnippet: zod.string(),
+      matchScore: zod.number(),
+      createdAt: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * @summary Get a single history entry by ID
+ */
+export const GetHistoryByIdParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetHistoryByIdResponse = zod.object({
+  id: zod.number(),
+  vacancySnippet: zod.string(),
+  vacancyText: zod.string(),
+  resumeText: zod.string(),
+  adaptedResume: zod.string(),
+  matchScore: zod.number(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Delete a history entry by ID
+ */
+export const DeleteHistoryParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const DeleteHistoryResponse = zod.object({
+  ok: zod.boolean(),
+});
+
+/**
  * @summary Delete an invited user
  */
 export const DeleteAdminUserParams = zod.object({
