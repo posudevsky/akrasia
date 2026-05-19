@@ -231,7 +231,7 @@ function AppContent() {
                   <ScreenAdapted
                     state={state}
                     onReset={resetState}
-                    onBackToAnalysis={() => updateState({ step: "analysis" })}
+                    onBackToAnalysis={() => updateState({ step: "analysis", userAnswers: [] })}
                     onSaved={(id) => {
                       updateState({ activeHistoryId: id });
                       setHistoryVersion((v) => v + 1);
