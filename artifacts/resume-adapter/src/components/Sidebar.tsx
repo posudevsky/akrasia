@@ -6,7 +6,7 @@ import {
   useDeleteHistory,
   getGetHistoryQueryKey,
 } from "@workspace/api-client-react";
-import type { AuthUser, HistoryEntry, HistoryList } from "@workspace/api-client-react";
+import type { AuthUser, HistoryEntry } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ export default function Sidebar({
   historyVersion = 0,
 }: SidebarProps) {
   const [open, setOpen] = useState(false);
+  const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set());
   const queryClient = useQueryClient();
   const logoutMutation = useLogout();
   const deleteHistoryMutation = useDeleteHistory();
@@ -77,15 +78,21 @@ export default function Sidebar({
 
   const handleDelete = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
+    if (deletingIds.has(id)) return;
+    setDeletingIds((prev) => new Set(prev).add(id));
     deleteHistoryMutation.mutate(
       { id },
       {
         onSuccess: () => {
-          queryClient.setQueryData<HistoryList>(
-            getGetHistoryQueryKey(),
-            (old) => old ? { entries: old.entries.filter((e) => e.id !== id) } : old
-          );
+          historyQuery.refetch();
           onHistoryDeleted(id);
+        },
+        onSettled: () => {
+          setDeletingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
         },
       }
     );
@@ -153,7 +160,7 @@ export default function Sidebar({
 
           <ul className="space-y-0.5">
             {entries.map((entry) => {
-              const isDeleting = deleteHistoryMutation.isPending && deleteHistoryMutation.variables?.id === entry.id;
+              const isDeleting = deletingIds.has(entry.id);
               return (
                 <li key={entry.id} className="group relative">
                   <button
