@@ -232,7 +232,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
           onClick={() => { setVacancyText(TEST_VACANCY); setResumeText(TEST_RESUME); }}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
         >
-          Добавить тестовые данные
+          Вставить тестовые данные
         </button>
       </div>
     </div>
