@@ -178,14 +178,19 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       });
     }
 
+    const KNOWN_SECTIONS = /^(опыт работы|навыки|образование|курсы|сертификаты|достижения|цель|о себе|обо мне|контакты|языки|проекты|дополнительно|дополнительное образование|рекомендации|experience|skills|education|summary|achievements|languages|certifications|about)$/i;
+
     const isSectionHeader = (text: string, afterBlank: boolean) => {
       const t = text.trim();
       if (t.length <= 1) return false;
       // All-caps line (e.g. "ОПЫТ РАБОТЫ", "НАВЫКИ")
       if (t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t)) return true;
+      // Known section names — always recognised regardless of blank lines
+      const tNaked = t.replace(/:$/, "");
+      if (KNOWN_SECTIONS.test(tNaked)) return true;
       // Smart detector: short clean line that follows a blank line
       if (afterBlank) {
-        const words = t.replace(/:$/, "").split(/\s+/);
+        const words = tNaked.split(/\s+/);
         const startsWithBullet = /^[•\-–—*·\d]/.test(t);
         const hasYear = /\b(19|20)\d{2}\b/.test(t);
         const hasURL = /https?:\/\/|www\./.test(t);
