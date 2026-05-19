@@ -1,14 +1,33 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { AppState } from "../App";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Download, FileText, ArrowLeft, Copy, Check, RotateCcw } from "lucide-react";
+import { Download, FileText, ArrowLeft, Copy, Check, RotateCcw, ArrowRight } from "lucide-react";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 
 interface ScreenAdaptedProps {
   state: AppState;
   onReset: () => void;
   onBackToAnalysis: () => void;
+}
+
+function useAnimatedCounter(target: number, duration = 900) {
+  const [value, setValue] = useState(0);
+  const raf = useRef<number>(0);
+
+  useEffect(() => {
+    const start = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(target * eased));
+      if (progress < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [target, duration]);
+
+  return value;
 }
 
 export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: ScreenAdaptedProps) {
@@ -63,6 +82,10 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     if (totalWeight === 0) return 0;
     return Math.round((earnedWeight / totalWeight) * 100);
   }, [state.analysisResult, state.userAnswers]);
+
+  const animatedOriginal = useAnimatedCounter(originalScore);
+  const animatedNew = useAnimatedCounter(newScore);
+  const delta = newScore - originalScore;
 
   const rawResume = state.adaptedResume || "";
   const plainTextResume = rawResume.replace(/<\/?change>/g, "").replace(/<\/?addition>/g, "");
@@ -235,13 +258,23 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     <div className="grid gap-4">
       {/* Header */}
       <div className="print:hidden">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Адаптированное резюме</h2>
-        <p className="text-slate-500 mt-1">
-          Соответствие вакансии:{" "}
-          <span className="font-medium text-slate-700 dark:text-slate-300">
-            {originalScore}% &rarr; {newScore}%
-          </span>
-        </p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Адаптированное резюме</h2>
+        <div className="flex items-center gap-5">
+          <div className="text-center">
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">было</div>
+            <div className="text-5xl font-bold text-slate-300">{animatedOriginal}%</div>
+          </div>
+          <ArrowRight className="w-6 h-6 text-slate-300 shrink-0" />
+          <div className="text-center">
+            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">стало</div>
+            <div className="text-5xl font-bold text-slate-900 dark:text-white">{animatedNew}%</div>
+          </div>
+          {delta > 0 && (
+            <div className="text-sm font-semibold text-green-600 bg-green-50 border border-green-200 rounded-full px-3 py-1 self-end mb-1">
+              +{delta}%
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Legend + download buttons */}
