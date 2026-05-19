@@ -29,6 +29,7 @@ export type AppState = {
   currentUser: AuthUser | null;
   activeHistoryId: number | null;
   matchScore: number | null;
+  uploadKey: number;
 };
 
 function AppContent() {
@@ -42,6 +43,7 @@ function AppContent() {
     currentUser: null,
     activeHistoryId: null,
     matchScore: null,
+    uploadKey: 0,
   });
 
   const [pendingHistoryEntry, setPendingHistoryEntry] = useState<HistoryEntry | null>(null);
@@ -109,6 +111,7 @@ function AppContent() {
       currentUser: prev.currentUser,
       activeHistoryId: null,
       matchScore: null,
+      uploadKey: prev.uploadKey + 1,
     }));
   };
 
@@ -124,6 +127,7 @@ function AppContent() {
       currentUser: null,
       activeHistoryId: null,
       matchScore: null,
+      uploadKey: 0,
     });
   };
 
@@ -180,7 +184,7 @@ function AppContent() {
 
               {state.step === "upload" && (
                 <motion.div
-                  key="upload"
+                  key={`upload-${state.uploadKey}`}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
