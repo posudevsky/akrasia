@@ -73,6 +73,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
+      // fallback for older browsers
       const ta = document.createElement("textarea");
       ta.value = plainTextResume;
       ta.style.position = "fixed";
@@ -102,13 +103,18 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   const handleDownloadDocx = async () => {
     try {
       const doc = new Document({
-        sections: [{
-          properties: {},
-          children: plainTextResume.split("\n").map(line =>
-            new Paragraph({ children: [new TextRun(line)] })
-          ),
-        }],
+        sections: [
+          {
+            properties: {},
+            children: plainTextResume.split("\n").map(line =>
+              new Paragraph({
+                children: [new TextRun(line)],
+              })
+            ),
+          },
+        ],
       });
+
       const blob = await Packer.toBlob(doc);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -131,26 +137,44 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   const renderResumeText = () => {
     if (!state.adaptedResume) return null;
 
-    type TagType = "change" | "addition" | null;
-    type Chunk = { text: string; tag: TagType };
-    type Line = { chunks: Chunk[]; rawText: string };
-
     const parts = state.adaptedResume.split(/(<change>|<\/change>|<addition>|<\/addition>)/);
-    let activeTag: TagType = null;
-    const lines: Line[] = [{ chunks: [], rawText: "" }];
 
-    for (const part of parts) {
+    type TagType = "change" | "addition" | null;
+    let activeTag: TagType = null;
+
+    type Line = { nodes: React.ReactNode[]; text: string };
+    const lines: Line[] = [{ nodes: [], text: "" }];
+    let nodeIdx = 0;
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
       if (part === "<change>") { activeTag = "change"; continue; }
       if (part === "</change>") { activeTag = null; continue; }
       if (part === "<addition>") { activeTag = "addition"; continue; }
       if (part === "</addition>") { activeTag = null; continue; }
       if (!part) continue;
 
-      part.split("\n").forEach((subline, subIdx) => {
-        if (subIdx > 0) lines.push({ chunks: [], rawText: "" });
+      const sublines = part.split("\n");
+      sublines.forEach((subline, subIdx) => {
+        if (subIdx > 0) lines.push({ nodes: [], text: "" });
         const cur = lines[lines.length - 1];
-        cur.rawText += subline;
-        if (subline) cur.chunks.push({ text: subline, tag: activeTag });
+        cur.text += subline;
+
+        if (activeTag === "change") {
+          cur.nodes.push(
+            <span key={`n-${nodeIdx++}`} style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-0.5 rounded-sm">
+              {subline}
+            </span>
+          );
+        } else if (activeTag === "addition") {
+          cur.nodes.push(
+            <span key={`n-${nodeIdx++}`} style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-0.5 rounded-sm">
+              {subline}
+            </span>
+          );
+        } else if (subline) {
+          cur.nodes.push(<span key={`n-${nodeIdx++}`}>{subline}</span>);
+        }
       });
     }
 
@@ -159,75 +183,55 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       return t.length > 1 && t === t.toUpperCase() && /[A-ZА-ЯЁ]/.test(t);
     };
 
-    const toSentenceCase = (text: string) =>
-      text.trim().split(/\s+/).map((word, idx) => {
-        if (/^[A-Z0-9]+$/.test(word)) return word;
-        return idx === 0
-          ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-          : word.toLowerCase();
-      }).join(" ");
-
-    const changeStyle = { backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" };
-    const additionStyle = { backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" };
-
-    const chunkToSpan = (chunk: Chunk, key: string) => {
-      if (chunk.tag === "change")
-        return <span key={key} style={changeStyle} className="px-0.5 rounded-sm">{chunk.text}</span>;
-      if (chunk.tag === "addition")
-        return <span key={key} style={additionStyle} className="px-0.5 rounded-sm">{chunk.text}</span>;
-      return <span key={key}>{chunk.text}</span>;
+    const toSentenceCase = (text: string) => {
+      const words = text.trim().split(/\s+/);
+      return words
+        .map((word, idx) => {
+          if (/^[A-Z0-9]+$/.test(word)) return word;
+          return idx === 0
+            ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            : word.toLowerCase();
+        })
+        .join(" ");
     };
 
     const textElements: React.ReactNode[] = [];
     let firstNonEmptySeen = false;
     let inSection = false;
-
-    lines.forEach((line, lineIdx) => {
-      const trimmed = line.rawText.trim();
-      const isEmpty = !trimmed;
-      const isHeader = isSectionHeader(trimmed);
+    lines.forEach((line, idx) => {
+      const isHeader = isSectionHeader(line.text);
+      const isEmpty = line.text.trim() === "";
+      const trimmed = line.text.trim();
 
       if (isEmpty) {
-        textElements.push(<div key={`line-${lineIdx}`} className="h-2" />);
-        return;
-      }
-
-      if (isHeader) {
+        textElements.push(<div key={`line-${idx}`} className="h-2" />);
+      } else if (isHeader) {
         inSection = true;
         const isName = !firstNonEmptySeen;
         firstNonEmptySeen = true;
         textElements.push(
-          <p key={`line-${lineIdx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : ""}`}>
+          <p key={`line-${idx}`} className={`font-bold leading-snug mb-0${isName ? " text-sm" : ""}`}>
             {toSentenceCase(trimmed)}
           </p>
         );
-        return;
+      } else {
+        const isName = !firstNonEmptySeen;
+        firstNonEmptySeen = true;
+
+        const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
+        const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
+        const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
+
+        const nodes: React.ReactNode[] = shouldBullet
+          ? [<span key="bullet">– </span>, ...line.nodes]
+          : line.nodes;
+
+        textElements.push(
+          <p key={`line-${idx}`} className={`leading-snug mb-0${isName ? " font-bold text-sm" : ""}`}>
+            {nodes}
+          </p>
+        );
       }
-
-      const isName = !firstNonEmptySeen;
-      firstNonEmptySeen = true;
-      const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
-      const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
-      const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
-
-      // Build nodes: if bulleting, prepend "– " into the first chunk's span
-      // so bullet and text share one continuous highlight block
-      let chunks = line.chunks;
-      if (shouldBullet) {
-        if (chunks.length > 0) {
-          chunks = [{ text: "– " + chunks[0].text, tag: chunks[0].tag }, ...chunks.slice(1)];
-        } else {
-          chunks = [{ text: "– ", tag: null }];
-        }
-      }
-
-      const nodes = chunks.map((chunk, i) => chunkToSpan(chunk, `chunk-${lineIdx}-${i}`));
-
-      textElements.push(
-        <p key={`line-${lineIdx}`} className={`leading-snug mb-0${isName ? " font-bold text-sm" : ""}`}>
-          {nodes}
-        </p>
-      );
     });
 
     return <div className="whitespace-pre-wrap">{textElements}</div>;
@@ -246,7 +250,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         </p>
       </div>
 
-      {/* Legend + action buttons */}
+      {/* Legend + download buttons */}
       <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
         <div className="flex flex-wrap gap-4 text-sm">
           <div className="flex items-center gap-2">
