@@ -194,6 +194,7 @@ function AppContent() {
                         analysisResult: res,
                         vacancyText: vac,
                         resumeText: resu,
+                        userAnswers: [],
                       })
                     }
                   />
