@@ -217,7 +217,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
         </Card>
       </div>
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-6">
         <button
           type="button"
           onClick={() => { setVacancyText(TEST_VACANCY); setResumeText(TEST_RESUME); }}
