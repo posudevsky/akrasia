@@ -10,6 +10,55 @@ import { useToast } from "@/hooks/use-toast";
 import { AppState } from "../App";
 import { UploadCloud, FileText, Briefcase, Loader2 } from "lucide-react";
 
+const TEST_VACANCY = `HR-аналитик
+
+Компания: Альфа-Банк
+Город: Москва
+
+Обязанности:
+— Формирование и поддержка HR-дашбордов и отчётности в Power BI
+— Анализ ключевых HR-метрик: текучесть, укомплектованность, eNPS
+— Выгрузка и обработка данных из 1С:ЗУП и корпоративных систем
+— Подготовка регулярной отчётности для руководства
+— Автоматизация отчётов с помощью SQL и Excel
+
+Требования:
+— Опыт работы в HR-аналитике или смежной области от 2 лет
+— Уверенный пользователь Excel (сводные таблицы, формулы)
+— Знание SQL на уровне написания выборок
+— Опыт работы с Power BI или аналогичными BI-инструментами
+— Знание основ статистики
+— Навыки работы с 1С:ЗУП
+
+Условия:
+— Офис в центре Москвы
+— Оформление по ТК РФ
+— ДМС со стоматологией`;
+
+const TEST_RESUME = `Иванов Иван Иванович
+
+ivan@email.ru | +7 999 123 45 67
+
+Опыт работы
+
+Альфа-Банк, специалист по персоналу, 2022 — настоящее время
+- Рассчитывал показатели текучести и укомплектованности штата
+- Ежемесячно готовил отчёты по численности и движению персонала в Excel
+- Вёл сводные таблицы по затратам на персонал
+
+Бета-Компания, ассистент HR-отдела, 2020 — 2022
+- Вёл кадровый документооборот
+- Помогал с подбором персонала
+- Формировал отчёты в Excel
+
+Образование
+
+НИУ ВШЭ, бакалавр, управление персоналом, 2022
+
+Навыки
+
+Excel, PowerPoint`;
+
 interface ScreenUploadProps {
   state: AppState;
   onAnalyzeSuccess: (res: AnalyzeResult, vacancy: string, resume: string) => void;
@@ -168,7 +217,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
         </Card>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-3">
         <Button 
           size="lg" 
           onClick={handleAnalyze} 
@@ -178,6 +227,13 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
           {analyzeMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {analyzeMutation.isPending ? "Анализирую соответствие..." : "Анализировать"}
         </Button>
+        <button
+          type="button"
+          onClick={() => { setVacancyText(TEST_VACANCY); setResumeText(TEST_RESUME); }}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+        >
+          Добавить тестовые данные
+        </button>
       </div>
     </div>
   );
