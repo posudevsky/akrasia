@@ -273,7 +273,7 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
       </div>
 
       {/* Resume card */}
-      <Card className="shadow-md print:shadow-none print:border-none print:m-0 print:p-0">
+      <Card className="shadow-md mt-1 print:shadow-none print:border-none print:m-0 print:p-0">
         <CardContent className="p-8 text-slate-800 dark:text-slate-200 text-xs leading-snug">
           {renderResumeText()}
         </CardContent>
