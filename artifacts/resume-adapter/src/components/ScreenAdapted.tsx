@@ -258,21 +258,18 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     <div className="grid gap-4">
       {/* Header */}
       <div className="print:hidden">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Адаптированное резюме</h2>
-        <div className="flex items-center gap-5">
-          <div className="text-center">
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">было</div>
-            <div className="text-5xl font-bold text-slate-300">{animatedOriginal}%</div>
-          </div>
-          <ArrowRight className="w-6 h-6 text-slate-300 shrink-0" />
-          <div className="text-center">
-            <div className="text-xs text-slate-400 mb-1 uppercase tracking-wide">стало</div>
-            <div className="text-5xl font-bold text-slate-900 dark:text-white">{animatedNew}%</div>
-          </div>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Адаптированное резюме</h2>
+        <div className="flex items-center gap-3 mt-1 flex-wrap">
+          <p className="text-slate-500">
+            Соответствие вакансии:{" "}
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              {originalScore}% &rarr; {newScore}%
+            </span>
+          </p>
           {delta > 0 && (
-            <div className="text-sm font-semibold text-green-600 bg-green-50 border border-green-200 rounded-full px-3 py-1 self-end mb-1">
-              +{delta}%
-            </div>
+            <span className="text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1">
+              Улучшение +{delta}%
+            </span>
           )}
         </div>
       </div>
