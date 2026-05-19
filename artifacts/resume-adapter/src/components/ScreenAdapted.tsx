@@ -57,8 +57,26 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
   const rawResume = state.adaptedResume || "";
   const plainTextResume = rawResume.replace(/<\/?change>/g, "").replace(/<\/?addition>/g, "");
 
-  // Text used for copy/download — edited version if available
-  const finalText = editedText ?? plainTextResume;
+  // Builds display text with bullet dashes applied (matches renderer logic)
+  const buildDisplayText = (text: string): string => {
+    const isSectionHeader = (t: string) => {
+      const tr = t.trim();
+      return tr.length > 1 && tr === tr.toUpperCase() && /[A-ZА-ЯЁ]/.test(tr);
+    };
+    let inSection = false;
+    return text.split("\n").map(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return "";
+      if (isSectionHeader(trimmed)) { inSection = true; return line; }
+      const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
+      const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
+      const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
+      return shouldBullet ? `– ${trimmed}` : line;
+    }).join("\n");
+  };
+
+  // Text used for copy/download — edited version if available, otherwise plain text with bullets
+  const finalText = editedText ?? buildDisplayText(plainTextResume);
 
   const handleStartEditing = () => {
     setEditDraft(finalText);
@@ -188,8 +206,8 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
     const parts = state.adaptedResume.split(/(<change>|<\/change>|<addition>|<\/addition>)/);
     type TagType = "change" | "addition" | null;
     let activeTag: TagType = null;
-    type Line = { nodes: React.ReactNode[]; text: string };
-    const lines: Line[] = [{ nodes: [], text: "" }];
+    type Line = { nodes: React.ReactNode[]; text: string; lineTag: TagType | "mixed" };
+    const lines: Line[] = [{ nodes: [], text: "", lineTag: null }];
     let nodeIdx = 0;
 
     for (let i = 0; i < parts.length; i++) {
@@ -202,9 +220,14 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
 
       const sublines = part.split("\n");
       sublines.forEach((subline, subIdx) => {
-        if (subIdx > 0) lines.push({ nodes: [], text: "" });
+        if (subIdx > 0) lines.push({ nodes: [], text: "", lineTag: null });
         const cur = lines[lines.length - 1];
         cur.text += subline;
+        // Track the dominant tag for this line (to colour the bullet)
+        if (activeTag && subline) {
+          if (cur.lineTag === null) cur.lineTag = activeTag;
+          else if (cur.lineTag !== activeTag) cur.lineTag = "mixed";
+        }
         if (activeTag === "change") {
           cur.nodes.push(
             <span key={`n-${nodeIdx++}`} style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-0.5 rounded-sm">
@@ -262,8 +285,16 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         const alreadyBulleted = /^[•\-–—*·]/.test(trimmed);
         const isTitleLine = / \| /.test(trimmed) || /\b(19|20)\d{2}\b/.test(trimmed);
         const shouldBullet = inSection && !isTitleLine && !alreadyBulleted;
-        const nodes: React.ReactNode[] = shouldBullet
-          ? [<span key="bullet">– </span>, ...line.nodes]
+        const bulletNode = (() => {
+          if (!shouldBullet) return null;
+          if (line.lineTag === "addition")
+            return <span key="bullet" style={{ backgroundColor: "#DBEAFE", borderBottom: "2px solid #3B82F6" }} className="px-0.5 rounded-sm">– </span>;
+          if (line.lineTag === "change")
+            return <span key="bullet" style={{ backgroundColor: "#FEF3C7", borderBottom: "2px solid #D97706" }} className="px-0.5 rounded-sm">– </span>;
+          return <span key="bullet">– </span>;
+        })();
+        const nodes: React.ReactNode[] = bulletNode
+          ? [bulletNode, ...line.nodes]
           : line.nodes;
         textElements.push(
           <p key={`line-${idx}`} className={`leading-snug mb-0${isName ? " font-bold text-sm" : ""}`}>
