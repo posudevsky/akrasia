@@ -250,16 +250,6 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
         </p>
       </div>
 
-      {/* Navigation buttons */}
-      <div className="flex justify-between gap-2 print:hidden">
-        <Button variant="outline" onClick={onBackToAnalysis}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
-        </Button>
-        <Button variant="outline" onClick={onReset}>
-          <RotateCcw className="w-4 h-4 mr-2" /> Начать заново
-        </Button>
-      </div>
-
       {/* Legend + download buttons */}
       <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
         <div className="flex flex-wrap gap-4 text-sm">
@@ -295,6 +285,16 @@ export default function ScreenAdapted({ state, onReset, onBackToAnalysis }: Scre
           {renderResumeText()}
         </CardContent>
       </Card>
+
+      {/* Navigation buttons */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2 print:hidden">
+        <Button variant="outline" onClick={onBackToAnalysis}>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Вернуться к анализу
+        </Button>
+        <Button variant="outline" onClick={onReset}>
+          <RotateCcw className="w-4 h-4 mr-2" /> Начать заново
+        </Button>
+      </div>
     </div>
   );
 }
