@@ -106,21 +106,21 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
 
   return (
     <div className="grid gap-6">
-      <h1 className="text-2xl font-bold text-slate-900">Анализ соответствия резюме вакансии</h1>
-      <Card className="bg-white shadow-sm border-blue-100">
+      <h1 className="text-2xl font-bold text-foreground">Анализ соответствия резюме вакансии</h1>
+      <Card className="bg-white shadow-sm border-[#E8E0EE]">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <p className="text-base font-semibold text-slate-700">{scoreMessage.heading}</p>
-              <p className="text-sm text-slate-500 mt-1">{scoreMessage.body}</p>
+              <p className="text-base font-semibold text-foreground">{scoreMessage.heading}</p>
+              <p className="text-sm text-muted-foreground mt-1">{scoreMessage.body}</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-4xl font-extrabold text-blue-600">{currentScore}%</div>
+              <div className="text-4xl font-extrabold text-[#4A355E]">{currentScore}%</div>
               <div className="w-32">
-                <div className="relative h-3 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E5E7EB" }}>
+                <div className="relative h-3 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E8E0EE" }}>
                   <div
                     className="h-full rounded-full transition-all"
-                    style={{ width: `${currentScore}%`, backgroundColor: "#2563EB" }}
+                    style={{ width: `${currentScore}%`, backgroundColor: "#D9DD55" }}
                   />
                 </div>
               </div>
@@ -137,16 +137,16 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
           >
-            <Card className="border-red-200 bg-red-50/30 overflow-hidden shadow-sm">
-              <div className="h-1 bg-red-500 w-full" />
+            <Card className="border-[#EDCACF] bg-[#FDF5F6] overflow-hidden shadow-sm">
+              <div className="h-1 bg-[#C96875] w-full" />
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start gap-4">
-                  <p className="font-medium text-slate-900 text-sm leading-snug">{capitalizeFirst(req.text)}</p>
+                  <p className="font-medium text-foreground text-sm leading-snug">{capitalizeFirst(req.text)}</p>
                   <div className="flex gap-2 shrink-0">
-                    <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-blue-600 hover:bg-blue-700" : ""}>
+                    <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-[#4A355E] hover:bg-[#3a2a4e]" : ""}>
                       {req.criticality === "must" ? "обязательное требование" : "желательное требование"}
                     </Badge>
-                    <Badge variant="destructive" className="flex items-center gap-1">
+                    <Badge className="flex items-center gap-1 bg-[#C96875] hover:bg-[#b85d6a] text-white border-transparent">
                       <AlertCircle className="w-3 h-3" />
                       отсутствует
                     </Badge>
@@ -156,7 +156,7 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
               <CardContent>
                 <Textarea
                   placeholder="Есть такой опыт? Расскажите кратко — где применяли (компания, проект) или на каком уровне владеете навыком."
-                  className="bg-white border-red-100 focus-visible:ring-red-400 text-sm"
+                  className="bg-white border-[#EDCACF] focus-visible:ring-[#C96875]/40 text-sm"
                   style={{ height: "60px", minHeight: "60px", resize: "none" }}
                   value={state.userAnswers.find(a => a.requirementId === req.id)?.answer || ""}
                   onChange={(e) => handleAnswerChange(req.id, e.target.value)}
@@ -173,20 +173,20 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: (missingReqs.length + i) * 0.05 }}
           >
-            <Card className="border-yellow-200 bg-yellow-50/30 shadow-sm">
+            <Card className="border-[#E5D5A0] bg-[#FDFAF3] shadow-sm">
               <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex-1">
-                  <p className="font-medium text-slate-900 text-sm">{capitalizeFirst(req.text)}</p>
-                  <p className="text-xs text-yellow-700 mt-1 flex items-center gap-1">
+                  <p className="font-medium text-foreground text-sm">{capitalizeFirst(req.text)}</p>
+                  <p className="text-xs text-[#8B6D1A] mt-1 flex items-center gap-1">
                     <Info className="w-3 h-3" />
                     Будет усилено при адаптации резюме
                   </p>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-blue-600 hover:bg-blue-700" : ""}>
+                  <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-[#4A355E] hover:bg-[#3a2a4e]" : ""}>
                     {req.criticality === "must" ? "обязательное требование" : "желательное требование"}
                   </Badge>
-                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                  <Badge variant="outline" className="bg-[#F0E4B0] text-[#7A5C10] border-[#E5D5A0]">
                     частично соответствует
                   </Badge>
                 </div>
@@ -202,14 +202,14 @@ export default function ScreenAnalysis({ state, updateState, onAdaptSuccess, onB
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: (missingReqs.length + partialReqs.length + i) * 0.05 }}
           >
-            <Card className="border-green-200 bg-green-50/30 shadow-sm">
+            <Card className="border-[#BAD4C2] bg-[#F4FAF6] shadow-sm">
               <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <p className="font-medium text-slate-900 text-sm flex-1">{capitalizeFirst(req.text)}</p>
+                <p className="font-medium text-foreground text-sm flex-1">{capitalizeFirst(req.text)}</p>
                 <div className="flex gap-2 shrink-0">
-                  <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-blue-600 hover:bg-blue-700" : ""}>
+                  <Badge variant={req.criticality === "must" ? "default" : "secondary"} className={req.criticality === "must" ? "bg-[#4A355E] hover:bg-[#3a2a4e]" : ""}>
                     {req.criticality === "must" ? "обязательное требование" : "желательное требование"}
                   </Badge>
-                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
+                  <Badge variant="outline" className="bg-[#D4EADB] text-[#2D6644] border-[#BAD4C2] flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" />
                     подтверждено
                   </Badge>

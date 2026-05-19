@@ -89,7 +89,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
   return (
     <div className="grid gap-6">
       <div>
-        <p className="text-slate-500 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Вставьте вакансию и резюме – система проанализирует соответствие и адаптирует резюме.
         </p>
       </div>
@@ -98,7 +98,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5 text-blue-600" />
+              <Briefcase className="h-5 w-5 text-[#F6909B]" />
               Описание вакансии
             </CardTitle>
           </CardHeader>
@@ -115,7 +115,7 @@ export default function ScreenUpload({ state, onAnalyzeSuccess }: ScreenUploadPr
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
+              <FileText className="h-5 w-5 text-[#F6909B]" />
               Ваше резюме
             </CardTitle>
           </CardHeader>

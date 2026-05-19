@@ -47,8 +47,8 @@
   --color-chart-5: hsl(var(--chart-5));
 
   --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-primary: hsl(var(--sidebar-primary));
   --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
   --color-sidebar-primary-border: var(--sidebar-primary-border);
@@ -79,35 +79,35 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --background: 0 0% 100%;
-  --foreground: 222 47% 11%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 222 47% 11%;
+  --background: 240 11% 96%;
+  --foreground: 240 28% 14%;
+  --border: 280 24% 91%;
+  --input: 280 24% 91%;
+  --ring: 278 28% 29%;
   --radius: 0.5rem;
 
-  --primary: 222 47% 11%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 278 28% 29%;
+  --primary-foreground: 0 0% 100%;
 
   --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222 47% 11%;
+  --secondary-foreground: 240 28% 14%;
 
   --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
+  --muted-foreground: 277 11% 48%;
 
   --accent: 210 40% 96.1%;
-  --accent-foreground: 222 47% 11%;
+  --accent-foreground: 240 28% 14%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --card-border: 214 32% 91%;
+  --card-foreground: 240 28% 14%;
+  --card-border: 280 24% 91%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --popover-border: 214 32% 91%;
+  --popover-foreground: 240 28% 14%;
+  --popover-border: 280 24% 91%;
 
   --chart-1: 12 76% 61%;
   --chart-2: 173 58% 39%;
@@ -115,14 +115,14 @@
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
 
-  --sidebar: 210 40% 96.1%;
-  --sidebar-foreground: 222 47% 11%;
-  --sidebar-border: 214 32% 91%;
-  --sidebar-primary: 222 47% 11%;
-  --sidebar-primary-foreground: 210 40% 98%;
-  --sidebar-accent: 210 40% 96.1%;
-  --sidebar-accent-foreground: 222 47% 11%;
-  --sidebar-ring: 222 47% 11%;
+  --sidebar: 278 28% 29%;
+  --sidebar-foreground: rgba(255,255,255,0.75);
+  --sidebar-border: rgba(255,255,255,0.1);
+  --sidebar-primary: 354 85% 76%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 354 85% 76%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 354 85% 76%;
 
   --app-font-sans: 'Inter', sans-serif;
   --app-font-serif: Georgia, serif;

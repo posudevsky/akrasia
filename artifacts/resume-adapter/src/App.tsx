@@ -146,7 +146,7 @@ function AppContent() {
   const showSidebar = state.step !== "login" && !!state.currentUser;
 
   return (
-    <div className="min-h-[100dvh] w-full bg-slate-50 dark:bg-slate-950 font-sans flex">
+    <div className="min-h-[100dvh] w-full bg-[#F5F5F7] font-sans flex">
       {showSidebar && (
         <Sidebar
           currentUser={state.currentUser}

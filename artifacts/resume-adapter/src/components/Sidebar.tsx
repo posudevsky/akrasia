@@ -102,7 +102,7 @@ export default function Sidebar({
     <>
       {/* Mobile burger button */}
       <button
-        className="fixed top-4 left-4 z-50 md:hidden flex items-center justify-center w-9 h-9 rounded-md bg-slate-900 text-white shadow-md"
+        className="fixed top-4 left-4 z-50 md:hidden flex items-center justify-center w-9 h-9 rounded-md bg-[#4A355E] text-white shadow-md"
         onClick={() => setOpen((v) => !v)}
         aria-label="Открыть меню"
       >
@@ -120,22 +120,22 @@ export default function Sidebar({
       {/* Sidebar panel */}
       <aside
         className={cn(
-          "fixed md:static inset-y-0 left-0 z-40 flex flex-col w-64 bg-slate-900 text-slate-100 shrink-0",
+          "fixed md:static inset-y-0 left-0 z-40 flex flex-col w-64 bg-[#4A355E] text-white shrink-0",
           "transition-transform duration-200 ease-in-out",
           open ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="px-5 pt-6 pb-4 border-b border-slate-700/60">
+        <div className="px-5 pt-6 pb-4 border-b border-white/10">
           <p className="text-lg font-bold tracking-tight text-white leading-none">акразия.</p>
-          <p className="text-xs text-slate-400 mt-1">адаптация резюме к вакансии</p>
+          <p className="text-xs text-white/60 mt-1">адаптация резюме к вакансии</p>
         </div>
 
         {/* Navigation */}
         <div className="px-3 pt-4">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 text-slate-100 hover:bg-slate-700 hover:text-white font-medium"
+            className="w-full justify-start gap-2 text-white hover:bg-white/8 hover:text-white font-medium"
             onClick={handleNewAdaptation}
           >
             <Plus className="w-4 h-4" />
@@ -146,16 +146,16 @@ export default function Sidebar({
         {/* History */}
         <div className="flex-1 overflow-y-auto px-3 pt-5 min-h-0">
           <div className="flex items-center gap-2 px-2 mb-2">
-            <History className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">История</span>
+            <History className="w-3.5 h-3.5 text-white/60" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-white/60">История</span>
           </div>
 
           {historyQuery.isLoading && (
-            <p className="text-xs text-slate-500 px-2 py-2">Загрузка...</p>
+            <p className="text-xs text-white/40 px-2 py-2">Загрузка...</p>
           )}
 
           {!historyQuery.isLoading && entries.length === 0 && (
-            <p className="text-xs text-slate-500 px-2 py-2">Адаптаций пока нет</p>
+            <p className="text-xs text-white/40 px-2 py-2">Адаптаций пока нет</p>
           )}
 
           <ul className="space-y-0.5">
@@ -169,8 +169,8 @@ export default function Sidebar({
                     className={cn(
                       "w-full text-left rounded-md px-2 py-2 pr-8 text-sm transition-colors",
                       activeHistoryId === entry.id
-                        ? "bg-slate-700 text-white"
-                        : "text-slate-300 hover:bg-slate-700/60 hover:text-white",
+                        ? "bg-[#F6909B]/22 text-white"
+                        : "text-white/60 hover:bg-white/8 hover:text-white",
                       isDeleting && "opacity-50"
                     )}
                   >
@@ -178,8 +178,8 @@ export default function Sidebar({
                       {entry.vacancySnippet || "Без названия"}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-slate-500">{formatDate(entry.createdAt)}</span>
-                      <span className="text-xs text-slate-500">{entry.matchScore}%</span>
+                      <span className="text-xs text-white/40">{formatDate(entry.createdAt)}</span>
+                      <span className="text-xs text-white/40">{entry.matchScore}%</span>
                     </div>
                   </button>
 
@@ -189,7 +189,7 @@ export default function Sidebar({
                     title="Удалить"
                     className={cn(
                       "absolute right-1 top-1/2 -translate-y-1/2 p-1 rounded",
-                      "text-slate-600 hover:text-red-400 hover:bg-slate-800",
+                      "text-white/30 hover:text-red-300 hover:bg-white/10",
                       "opacity-0 group-hover:opacity-100 transition-opacity",
                       isDeleting && "opacity-50 pointer-events-none"
                     )}
@@ -204,13 +204,13 @@ export default function Sidebar({
 
         {/* User info + logout */}
         {currentUser && (
-          <div className="border-t border-slate-700/60 px-3 py-3 mt-auto">
+          <div className="border-t border-white/10 px-3 py-3 mt-auto">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-400 truncate flex-1">{currentUser.email}</span>
+              <span className="text-xs text-white/60 truncate flex-1">{currentUser.email}</span>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-slate-400 hover:text-white hover:bg-slate-700 shrink-0 h-7 w-7"
+                className="text-white/60 hover:text-white hover:bg-white/10 shrink-0 h-7 w-7"
                 onClick={handleLogout}
                 title="Выйти"
               >
