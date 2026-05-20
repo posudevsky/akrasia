@@ -23,7 +23,7 @@ async function callOnce(prompt: string): Promise<string> {
         model: YANDEX_MODEL,
         messages: [{ role: "user", content: prompt }],
         temperature: 0.1,
-        max_tokens: 16384,
+        max_tokens: 8192,
       }),
       signal: controller.signal,
     });
