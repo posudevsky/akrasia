@@ -3,7 +3,7 @@ const YANDEX_FOLDER_ID = process.env.YANDEX_FOLDER_ID;
 const YANDEX_ENDPOINT = "https://llm.api.cloud.yandex.net/v1/chat/completions";
 const YANDEX_MODEL = `gpt://${YANDEX_FOLDER_ID}/qwen3-235b-a22b-fp8/latest`;
 
-export async function callYandexLLM(prompt: string): Promise<string> {
+export async function callYandexLLM(prompt: string, maxTokens = 8192): Promise<string> {
   if (!YANDEX_API_KEY || !YANDEX_FOLDER_ID) {
     throw new Error("YANDEX_API_KEY and YANDEX_FOLDER_ID must be set");
   }
@@ -24,7 +24,7 @@ export async function callYandexLLM(prompt: string): Promise<string> {
         },
       ],
       temperature: 0.1,
-      max_tokens: 8192,
+      max_tokens: maxTokens,
     }),
   });
 

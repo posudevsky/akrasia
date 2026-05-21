@@ -62,7 +62,7 @@ router.post("/adapt", async (req, res): Promise<void> => {
     .replace("{{user_answers}}", answersText || "Нет дополнительных ответов");
 
   try {
-    const rawJson = await callYandexLLM(prompt);
+    const rawJson = await callYandexLLM(prompt, 16384);
     const result = JSON.parse(rawJson) as { resume_updated?: string; resumeUpdated?: string };
     const resumeUpdated = result.resume_updated ?? result.resumeUpdated ?? "";
     const validated = AdaptResumeResponse.safeParse({ resumeUpdated });
