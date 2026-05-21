@@ -25,6 +25,7 @@ export async function callYandexLLM(prompt: string, maxTokens = 8192): Promise<s
       ],
       temperature: 0.1,
       max_tokens: maxTokens,
+      enable_thinking: false,
     }),
   });
 
